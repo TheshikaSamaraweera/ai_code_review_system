@@ -1,6 +1,7 @@
 from agents.quality_agent import run_quality_agent
 from agents.static_analysis_agent import run_static_analysis
 from agents.error_comparator_agent import compare_issues
+from agents.critic_agent import run_critic_agent
 import tempfile
 import os
 
@@ -36,10 +37,13 @@ def run_control_agent(code, language):
     # Compare Issues
     merged_issues = compare_issues(quality_results, static_results)
 
-    # Print issues
-    for issue in merged_issues:
-        print(f"\n🔸 Line {issue['line']} [{issue['source']}]:")
-        print(f"   ❗ {issue['description']}")
-        print(f"   💡 {issue['suggestion']}")
+    # Critic Agent for reflection
+    refined_issues = run_critic_agent(code, merged_issues, api_key)
 
-    print("\n✅ Phase 5 Complete: Unified issue list ready.")
+    for issue in refined_issues:
+        print(f"\n🔍 Refined [Line {issue['line']}]:")
+        print(f"❗ {issue['description']}")
+        print(f"💡 {issue['suggestion']}")
+        print(f"ℹ️ {issue['explanation']}")
+
+    print("\n✅ Phase 6 Complete: Refined suggestions with reasoning.")
