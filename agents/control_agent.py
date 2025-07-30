@@ -2,13 +2,14 @@ from agents.quality_agent import run_quality_agent
 from agents.static_analysis_agent import run_static_analysis
 from agents.error_comparator_agent import compare_issues
 from agents.critic_agent import run_critic_agent
+from agents.refactor_agent import run_refactor_agent
+from utils.code_diff import show_code_diff
 import tempfile
 import os
 
 def run_control_agent(code, language):
     print("\n🧠 Control Agent Activated")
     print(f"➡️ Language: {language}")
-
     print("🧩 Activating Agents...\n")
 
     # Replace QualityAgent stub with real call
@@ -23,21 +24,21 @@ def run_control_agent(code, language):
     # Run Quality Agent (LLM)
     quality_results = run_quality_agent(code, api_key)
 
-    # Save code to temp file
-    with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as temp_code_file:
-        temp_code_file.write(code)
-        temp_path = temp_code_file.name
+    # Phase 2: Static Analysis (write to temp file)
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as temp_code_file:
+            temp_code_file.write(code)
+            temp_path = temp_code_file.name
 
-    # Run Static Analysis
-    static_results = run_static_analysis(temp_path)
+        static_results = run_static_analysis(temp_path)
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
 
-    # Clean up
-    os.remove(temp_path)
-
-    # Compare Issues
+    # Phase 3: Compare
     merged_issues = compare_issues(quality_results, static_results)
 
-    # Critic Agent for reflection
+    # Phase 4–6: Critic
     refined_issues = run_critic_agent(code, merged_issues, api_key)
 
     for issue in refined_issues:
@@ -47,3 +48,14 @@ def run_control_agent(code, language):
         print(f"ℹ️ {issue['explanation']}")
 
     print("\n✅ Phase 6 Complete: Refined suggestions with reasoning.")
+
+    # Phase 7: Refactor
+    refactored_code = run_refactor_agent(code, refined_issues, api_key)
+    if not refactored_code:
+        return
+
+    show_code_diff(code, refactored_code)
+    print("\n✅ Phase 7 Complete: Refactored code generated and compared.")
+
+    # Optionally return for Phase 8
+    return refactored_code
