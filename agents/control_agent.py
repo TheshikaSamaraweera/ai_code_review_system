@@ -4,6 +4,7 @@ from agents.error_comparator_agent import compare_issues
 from agents.critic_agent import run_critic_agent
 from agents.refactor_agent import run_refactor_agent
 from utils.code_diff import show_code_diff
+from cli.apply_fixes import apply_fixes
 import tempfile
 import os
 
@@ -56,6 +57,7 @@ def run_control_agent(code, language):
 
     show_code_diff(code, refactored_code)
     print("\n✅ Phase 7 Complete: Refactored code generated and compared.")
-
+    # ... after show_code_diff()
+    apply_fixes(code, refactored_code)
     # Optionally return for Phase 8
     return refactored_code
