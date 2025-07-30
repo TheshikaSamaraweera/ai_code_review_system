@@ -6,6 +6,7 @@ from agents.refactor_agent import run_refactor_agent
 from utils.code_diff import show_code_diff
 from cli.apply_fixes import apply_fixes
 from memory.session_memory import remember_issue, remember_feedback, show_session_summary
+from agents.optimization_agent import run_optimization_agent
 import tempfile
 import os
 
@@ -42,13 +43,15 @@ def run_control_agent(code, language):
 
     # Phase 4–6: Critic
     refined_issues = run_critic_agent(code, merged_issues, api_key)
-
-    for issue in refined_issues:
-        print(f"\n🔍 Refined [Line {issue['line']}]:")
-        print(f"❗ {issue['description']}")
-        print(f"💡 {issue['suggestion']}")
-        print(f"ℹ️ {issue['explanation']}")
-        remember_issue(issue)
+    # Run Optimization Agent
+    optimization_issues = run_optimization_agent(code, api_key)
+    if optimization_issues:
+        for issue in refined_issues:
+            print(f"\n🔍 Refined [Line {issue['line']}]:")
+            print(f"❗ {issue['description']}")
+            print(f"💡 {issue['suggestion']}")
+            print(f"ℹ️ {issue['explanation']}")
+            remember_issue(issue)
 
     print("\n✅ Phase 6 Complete: Refined suggestions with reasoning.")
 
