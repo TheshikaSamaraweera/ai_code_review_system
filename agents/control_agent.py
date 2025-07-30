@@ -1,8 +1,8 @@
-import os
-import tempfile
-
 from agents.quality_agent import run_quality_agent
 from agents.static_analysis_agent import run_static_analysis
+from agents.error_comparator_agent import compare_issues
+import tempfile
+import os
 
 def run_control_agent(code, language):
     print("\n🧠 Control Agent Activated")
@@ -19,20 +19,27 @@ def run_control_agent(code, language):
 
     print("🧩 Activating Agents...\n")
 
-    # Run Quality Agent
+    # Run Quality Agent (LLM)
     quality_results = run_quality_agent(code, api_key)
 
-    # Write code to temp file for static tools
+    # Save code to temp file
     with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as temp_code_file:
         temp_code_file.write(code)
         temp_path = temp_code_file.name
 
-    # Run Static Analysis Agent
+    # Run Static Analysis
     static_results = run_static_analysis(temp_path)
 
     # Clean up
     os.remove(temp_path)
 
-    print("\n📊 Summary:")
-    print(f"🔍 Quality Score: {quality_results.get('score')}")
-    print(f"📋 Static Issues: {len(static_results)}")
+    # Compare Issues
+    merged_issues = compare_issues(quality_results, static_results)
+
+    # Print issues
+    for issue in merged_issues:
+        print(f"\n🔸 Line {issue['line']} [{issue['source']}]:")
+        print(f"   ❗ {issue['description']}")
+        print(f"   💡 {issue['suggestion']}")
+
+    print("\n✅ Phase 5 Complete: Unified issue list ready.")
