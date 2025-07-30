@@ -5,6 +5,7 @@ from agents.critic_agent import run_critic_agent
 from agents.refactor_agent import run_refactor_agent
 from utils.code_diff import show_code_diff
 from cli.apply_fixes import apply_fixes
+from memory.session_memory import remember_issue, remember_feedback, show_session_summary
 import tempfile
 import os
 
@@ -47,6 +48,7 @@ def run_control_agent(code, language):
         print(f"❗ {issue['description']}")
         print(f"💡 {issue['suggestion']}")
         print(f"ℹ️ {issue['explanation']}")
+        remember_issue(issue)
 
     print("\n✅ Phase 6 Complete: Refined suggestions with reasoning.")
 
@@ -60,4 +62,5 @@ def run_control_agent(code, language):
     # ... after show_code_diff()
     apply_fixes(code, refactored_code)
     # Optionally return for Phase 8
+    show_session_summary()
     return refactored_code
