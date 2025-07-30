@@ -1,18 +1,19 @@
+from agents.quality_agent import run_quality_agent
+
 def run_control_agent(code, language):
     print("\n🧠 Control Agent Activated")
     print(f"➡️ Language: {language}")
 
-    # Simulate agent activation (no real analysis yet)
-    selected_agents = [
-        "QualityAgent",
-        "SecurityAgent",
-        "SmellAgent",
-        "VulnerabilityAgent",
-        "OptimizationAgent"
-    ]
+    print("🧩 Activating Agents...\n")
 
-    print("🧩 Activating Agents...")
-    for agent_name in selected_agents:
-        print(f"✅ {agent_name} executed")
+    # Replace QualityAgent stub with real call
+    from os import getenv
+    api_key = "AIzaSyDaW3FIrAlu3Kf_iLIDt8j5wlOw3lXTDiY"
+    if not api_key:
+        print("❌ GEMINI_API_KEY not set in environment.")
+        return
 
-    print("\n🚀 Phase 2 Complete: Control Agent ran all modules (stubbed)")
+    quality_results = run_quality_agent(code, api_key)
+
+    print("\n✅ Completed QualityAgent")
+    print("🧪 (Other agents are still stubs)")
