@@ -31,7 +31,9 @@ def run_pylint(file_path):
                 "tool": "pylint",
                 "line": item.get("line", 0),
                 "issue": item.get("message", ""),
-                "suggestion": item.get("symbol", "")
+                "suggestion": item.get("symbol", ""),
+                "severity": "medium",
+                "confidence": 0.8
             })
     except Exception as e:
         print(f"⚠️ pylint failed: {e}")
@@ -53,7 +55,9 @@ def run_bandit(file_path):
                 "tool": "bandit",
                 "line": item.get("line_number", 0),
                 "issue": item.get("issue_text", ""),
-                "suggestion": item.get("test_name", "")
+                "suggestion": item.get("test_name", ""),
+                "severity": "high",
+                "confidence": 0.95
             })
     except Exception as e:
         print(f"⚠️ bandit failed: {e}")

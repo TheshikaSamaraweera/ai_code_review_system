@@ -43,6 +43,8 @@ def run_critic_agent(code, merged_issues, api_key):
     # Optionally remember refined issues
     for issue in refined_issues:
         remember_issue(issue)
+        issue.setdefault("severity", "medium")
+        issue.setdefault("confidence", 0.85)
 
     print(f"✅ Critic Agent provided {len(refined_issues)} refined issues.")
     return refined_issues

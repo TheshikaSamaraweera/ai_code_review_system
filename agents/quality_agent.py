@@ -23,7 +23,12 @@ def run_quality_agent(code, api_key):
         return {}
 
     print(f"✅ QualityAgent Score: {result.get('score')}")
+    # Inside for loop where issues are appended
     for issue in result.get("issues", []):
         print(f"⚠️ Line {issue['line']}: {issue['issue']} ➜ {issue['suggestion']}")
+
+        # Add severity and confidence estimation (mock logic)
+        issue["severity"] = "high" if "security" in issue["issue"].lower() else "medium"
+        issue["confidence"] = 0.9  # Default for LLM suggestions
 
     return result

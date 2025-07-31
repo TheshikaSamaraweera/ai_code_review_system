@@ -1,4 +1,6 @@
 import argparse
+import json
+
 from utils.file_loader import load_file
 from controls.recursive_controller import build_langgraph_loop
 
@@ -21,21 +23,28 @@ def main():
         "history": [],
         "continue_": True,
         "refactored_code": initial_code,
+        "auto_refine": None,
+        "max_outer_iterations": 5
     }
 
-    # Run the graph
     final = graph.invoke(state)
 
-    # Display final code
-    print("\n✅ Final Refactored Code:\n")
-    print(final.get("refactored_code", "[No code returned]"))
+    # Show best refined issues
+    print("\n📌 Final Refined Issues:")
+    print(json.dumps(final.get("best_refined_issues", []), indent=2))
 
-    # Show summary of iterations
+    # Final result
+    print("\n✅ Final Refactored Code:\n")
+    print(final.get("best_code", "[No code returned]"))
+
+    # Iteration summary
     print("\n📚 Iteration Summary:")
     for step in final["history"]:
         print(f"\n🧾 Iteration {step['iteration']}:")
-        print("Refined Issues:", len(step["refined_issues"]))
-        print("Code Preview:\n", step["refactored_code"][:200])
+        print(f"   Quality Score: {step.get('score', '?')}")
+        print("   Code Preview:")
+        print(step["refactored_code"][:200])
+
 
 if __name__ == "__main__":
     main()
