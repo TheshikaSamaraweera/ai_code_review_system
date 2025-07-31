@@ -13,57 +13,70 @@ import os
 def run_control_agent(code, language):
     print("\n🧠 Control Agent Activated")
     print(f"➡️ Language: {language}")
-    print("🧩 Activating Agents...\n")
+    print("🧩 Phase 1: Analyze Only...\n")
 
     # Replace QualityAgent stub with real call
     from os import getenv
     api_key = "AIzaSyDaW3FIrAlu3Kf_iLIDt8j5wlOw3lXTDiY"
     if not api_key:
-        print("❌ GEMINI_API_KEY not set in environment.")
+        print("❌ No API key provided.")
         return
 
-    print("🧩 Activating Agents...\n")
-
-    # Run Quality Agent (LLM)
+    # Run Quality Agent
     quality_results = run_quality_agent(code, api_key)
 
-    # Phase 2: Static Analysis (write to temp file)
-    try:
-        with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as temp_code_file:
-            temp_code_file.write(code)
-            temp_path = temp_code_file.name
+    # Static Analysis
+    with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as temp_code_file:
+        temp_code_file.write(code)
+        temp_path = temp_code_file.name
+    static_results = run_static_analysis(temp_path)
+    os.remove(temp_path)
 
-        static_results = run_static_analysis(temp_path)
-    finally:
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
-
-    # Phase 3: Compare
+    # Merge
     merged_issues = compare_issues(quality_results, static_results)
 
-    # Phase 4–6: Critic
+    # Refine via critic
     refined_issues = run_critic_agent(code, merged_issues, api_key)
-    # Run Optimization Agent
-    optimization_issues = run_optimization_agent(code, api_key)
-    if optimization_issues:
-        for issue in refined_issues:
-            print(f"\n🔍 Refined [Line {issue['line']}]:")
-            print(f"❗ {issue['description']}")
-            print(f"💡 {issue['suggestion']}")
-            print(f"ℹ️ {issue['explanation']}")
-            remember_issue(issue)
 
-    print("\n✅ Phase 6 Complete: Refined suggestions with reasoning.")
+    print("\n🧾 Final Suggestions (Phase 1):\n")
+    for issue in refined_issues:
+        print(f"🔍 Line {issue['line']} | {issue['description']}")
+        print(f"💡 Suggestion: {issue['suggestion']}")
+        print(f"ℹ️ Explanation: {issue.get('explanation', 'N/A')}")
+        print(f"🔴 Severity: {issue.get('severity')} | 🔘 Confidence: {issue.get('confidence')}\n")
 
-    # Phase 7: Refactor
-    refactored_code = run_refactor_agent(code, refined_issues, api_key)
-    if not refactored_code:
+    # Ask user
+    user_input = input("🤖 Do you want to apply and iteratively refine the code? (y/N): ").strip().lower()
+    if user_input != "y":
+        print("🚫 Skipping iterative refinement.")
         return
 
-    show_code_diff(code, refactored_code)
-    print("\n✅ Phase 7 Complete: Refactored code generated and compared.")
-    # ... after show_code_diff()
-    apply_fixes(code, refactored_code)
-    # Optionally return for Phase 8
-    show_session_summary()
-    return refactored_code
+    print("\n🔁 Starting AI-Driven Refinement Loop...")
+
+    from controls.recursive_controller import build_langgraph_loop
+    graph = build_langgraph_loop()
+
+    state = {
+        "api_key": api_key,
+        "code": code,
+        "iteration": 0,
+        "continue_": True,
+        "auto_refine": True,
+        "max_outer_iterations": 4,
+    }
+
+    final = graph.invoke(state)
+
+    # Show final result
+    best_code = final.get("best_code", code)
+    print("\n✅ Final Refactored Code:\n")
+    print(best_code)
+
+    print("\n📚 Iteration Summary:")
+    for step in final.get("history", []):
+        print(f"\n🧾 Iteration {step['iteration']}:")
+        print(f"   Score: {step['score']}")
+        print(f"   Issues: {len(step['refined_issues'])}")
+        print(f"   Preview:\n{step['refactored_code'][:200]}...\n")
+
+    return best_code

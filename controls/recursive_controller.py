@@ -19,8 +19,13 @@ class CodeState(TypedDict):
     history: List[dict]
     continue_: bool
     refactored_code: str
-    auto_refine: bool  # <--- add this line
-    max_outer_iterations:int
+    auto_refine: bool
+    max_outer_iterations: int
+    best_code: str
+    best_score: float
+    score: float
+    no_improvement_count: int
+    best_refined_issues: List[dict]
 
 
 def build_langgraph_loop():
@@ -30,13 +35,9 @@ def build_langgraph_loop():
         outer_iteration = state.get("iteration", 0)
         history = state.get("history", [])
         auto_refine = state.get("auto_refine", True)
-        max_outer_iterations = 4
+        max_outer_iterations = state.get("max_outer_iterations", 4)
 
-        best_code = state.get("best_code", code)
-        best_score = state.get("best_score", -1)
-        best_refined_issues = state.get("best_refined_issues", [])
-
-        print(f"\n🔁 Outer Iteration {outer_iteration} (User approved)")
+        print(f"\n🔁 Outer Iteration {outer_iteration} (User approved)\n")
 
         # Step 1: Quality Agent
         quality_results = run_quality_agent(code, api_key)
@@ -50,26 +51,35 @@ def build_langgraph_loop():
         static_results = run_static_analysis(temp_path)
         os.remove(temp_path)
 
-        # Step 3: Compare
+        # Step 3: Merge issues
         merged_issues = compare_issues(quality_results, static_results)
 
-        # Step 4: Critic
+        # Step 4: Refine issues
         refined_issues = run_critic_agent(code, merged_issues, api_key)
 
-        # Print formatted refined issues
         print(f"\n📌 Refined Issues:")
         print(json.dumps(refined_issues, indent=2))
 
         # Step 5: Refactor
         refactored_code = run_refactor_agent(code, refined_issues, api_key)
 
-        # Track best by score
+        # Load previous bests
+        best_code = state.get("best_code", code)
+        best_score = state.get("best_score", -1)
+        best_refined_issues = state.get("best_refined_issues", [])
+        prev_score = state.get("score", 0)
+        no_improvement_count = state.get("no_improvement_count", 0)
+
+        # Check for improvement
         if score > best_score:
             best_code = refactored_code
             best_score = score
             best_refined_issues = refined_issues
+            no_improvement_count = 0
+        elif score <= prev_score:
+            no_improvement_count += 1
 
-        # Save this step
+        # Save history
         history.append({
             "iteration": f"{outer_iteration}.0",
             "score": score,
@@ -77,8 +87,8 @@ def build_langgraph_loop():
             "refactored_code": refactored_code
         })
 
-        # Loop control
-        continue_loop = outer_iteration + 1 < max_outer_iterations
+        # Control loop continuation
+        continue_loop = (outer_iteration + 1 < max_outer_iterations) and (no_improvement_count < 2)
 
         return {
             "code": refactored_code,
@@ -90,6 +100,9 @@ def build_langgraph_loop():
             "auto_refine": True,
             "best_code": best_code,
             "best_score": best_score,
+            "score": score,
+            "no_improvement_count": no_improvement_count,
+            "max_outer_iterations": max_outer_iterations,
             "best_refined_issues": best_refined_issues
         }
 
@@ -105,19 +118,5 @@ def build_langgraph_loop():
         "refine": "refine",
         "end": "__end__"
     })
-    def refine_once(code: str, api_key: str, iteration: int):
-        quality_results = run_quality_agent(code, api_key)
-        with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as temp_file:
-            temp_file.write(code)
-            temp_path = temp_file.name
-
-        static_results = run_static_analysis(temp_path)
-        os.remove(temp_path)
-
-        merged_issues = compare_issues(quality_results, static_results)
-        refined_issues = run_critic_agent(code, merged_issues, api_key)
-        refactored_code = run_refactor_agent(code, refined_issues, api_key)
-
-        return refactored_code, refined_issues
 
     return graph.compile()
