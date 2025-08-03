@@ -3,14 +3,14 @@ import os
 import json
 from typing import TypedDict, List, Literal
 
-from langgraph.graph import StateGraph, define_schema
+from langgraph.graph import StateGraph
 
 from agents.quality_agent import run_quality_agent
 from agents.static_analysis_agent import run_static_analysis
 from agents.error_comparator_agent import compare_issues
 from agents.critic_agent import run_critic_agent
 from agents.refactor_agent import run_refactor_agent
-
+from agents.security_agent import run_security_agent
 
 class CodeState(TypedDict):
     code: str
@@ -42,7 +42,9 @@ def build_langgraph_loop():
         # Step 1: Quality Agent
         quality_results = run_quality_agent(code, api_key)
         score = quality_results.get("score", 0)
-        ai_issues = quality_results.get("issues", [])
+        
+        # Step 1.5: Security Agent
+        security_results = run_security_agent(code, api_key)
 
         # Step 2: Static Analysis
         with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as temp_file:
@@ -52,7 +54,7 @@ def build_langgraph_loop():
         os.remove(temp_path)
 
         # Step 3: Merge issues
-        merged_issues = compare_issues(quality_results, static_results)
+        merged_issues = compare_issues(quality_results, security_results, static_results)
 
         # Step 4: Refine issues
         refined_issues = run_critic_agent(code, merged_issues, api_key)
@@ -108,8 +110,6 @@ def build_langgraph_loop():
 
     def should_continue(state: CodeState) -> Literal["refine", "end"]:
         return "refine" if state.get("continue_", False) else "end"
-
-    define_schema()
 
     graph = StateGraph(CodeState)
     graph.add_node("refine", refinement_step)

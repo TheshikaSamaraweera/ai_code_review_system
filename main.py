@@ -4,8 +4,8 @@ from utils.file_loader import load_file  # optional if you're using a loader
 from agents.quality_agent import run_quality_agent
 from agents.static_analysis_agent import run_static_analysis
 from agents.error_comparator_agent import compare_issues
+from agents.security_agent import run_security_agent
 from controls.recursive_controller import build_langgraph_loop
-
 
 def main():
     # Load API key
@@ -25,6 +25,9 @@ def main():
     quality_results = run_quality_agent(code, api_key)
     score = quality_results.get("score", 0)
 
+    # Run Security Agent
+    security_results = run_security_agent(code, api_key)
+
     # Run Static Analysis
     with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as temp_file:
         temp_file.write(code)
@@ -32,8 +35,8 @@ def main():
     static_results = run_static_analysis(temp_path)
     os.remove(temp_path)
 
-    # Merge AI and static tool issues
-    merged_issues = compare_issues(quality_results, static_results)
+    # Merge AI(Quality, security) and static tool issues
+    merged_issues = compare_issues(quality_results, security_results, static_results)
 
     print("\n📌 Merged Issues Summary:")
     for i, issue in enumerate(merged_issues, 1):

@@ -3,6 +3,7 @@ from agents.static_analysis_agent import run_static_analysis
 from agents.error_comparator_agent import compare_issues
 from agents.critic_agent import run_critic_agent
 from agents.refactor_agent import run_refactor_agent
+from agents.security_agent import run_security_agent
 from utils.code_diff import show_code_diff
 from cli.apply_fixes import apply_fixes
 from memory.session_memory import remember_issue, remember_feedback, show_session_summary
@@ -25,6 +26,9 @@ def run_control_agent(code, language):
     # Run Quality Agent
     quality_results = run_quality_agent(code, api_key)
 
+    # Run Security Agent  
+    security_results = run_security_agent(code, api_key)
+
     # Static Analysis
     with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as temp_code_file:
         temp_code_file.write(code)
@@ -33,7 +37,7 @@ def run_control_agent(code, language):
     os.remove(temp_path)
 
     # Merge
-    merged_issues = compare_issues(quality_results, static_results)
+    merged_issues = compare_issues(quality_results, security_results, static_results)
 
     # Refine via critic
     refined_issues = run_critic_agent(code, merged_issues, api_key)

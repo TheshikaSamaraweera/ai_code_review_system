@@ -21,8 +21,10 @@ def run_quality_agent(code, api_key):
         print("❌ Failed to parse Gemini response:", e)
         print("Raw output:\n", response.text)
         return {}
+    
+    print(f"✅ Total Quality Issues Found: {len(result.get('issues', []))}")
 
-    print(f"✅ QualityAgent Score: {result.get('score')}")
+    print(f"✅ Quality Agent Score: {result.get('score')}")
     # Inside for loop where issues are appended
     for issue in result.get("issues", []):
         print(f"⚠️ Line {issue['line']}: {issue['issue']} ➜ {issue['suggestion']}")

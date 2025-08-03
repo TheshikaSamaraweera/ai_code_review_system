@@ -13,6 +13,8 @@ def run_static_analysis(file_path):
     # Optional: all_issues += run_semgrep(file_path)
 
     print(f"✅ Static Analysis found {len(all_issues)} issues.")
+    for issue in all_issues:
+        print(f"🟡 Line {issue['line']}: {issue['issue']} ➜ {issue['suggestion']}")
     return all_issues
 
 def run_pylint(file_path):

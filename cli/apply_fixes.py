@@ -1,7 +1,5 @@
 from memory.session_memory import remember_feedback
 
-
-
 def apply_fixes(original_code, refactored_code):
     print("\n💬 Do you want to apply the suggested fixes?")
     print("Type 'yes' to apply and save, or 'no' to discard.")
