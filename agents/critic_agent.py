@@ -5,7 +5,7 @@ from memory.session_memory import remember_issue  # Optional: for Phase 9 sessio
 def run_critic_agent(code, merged_issues, api_key):
     print("\n🤔 Critic Agent Activated: Reflecting on all issues...")
 
-    gemini = init_gemini(api_key)
+    gemini = init_gemini()
 
     # Load structured prompt
     try:

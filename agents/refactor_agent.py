@@ -5,7 +5,7 @@ from llm.gemini_client import init_gemini
 def run_refactor_agent(original_code, refined_issues, api_key):
     print("\n🔧 Running Refactor Agent...")
 
-    gemini = init_gemini(api_key)
+    gemini = init_gemini()
 
     with open("prompts/refactor_prompt.txt", "r") as f:
         prompt_template = f.read()
