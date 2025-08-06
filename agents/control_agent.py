@@ -7,6 +7,7 @@ from utils.code_diff import show_code_diff
 from cli.apply_fixes import apply_fixes
 from memory.session_memory import remember_issue, remember_feedback, show_session_summary
 from agents.optimization_agent import run_optimization_agent
+from utils.detect_language import detect_language
 import tempfile
 import os
 
@@ -24,8 +25,8 @@ def run_control_agent(code, language):
     # Run Quality Agent
     quality_results = run_quality_agent(code, api_key)
 
-    # Static Analysis
-    with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as temp_code_file:
+    # Static Analysis with detected language
+    with tempfile.NamedTemporaryFile(suffix=f".{language.lower()}", delete=False, mode="w") as temp_code_file:
         temp_code_file.write(code)
         temp_path = temp_code_file.name
     static_results = run_static_analysis(temp_path)

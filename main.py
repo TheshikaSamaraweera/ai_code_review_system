@@ -219,6 +219,8 @@ def main():
         "continue_": True,
         "auto_refine": True,
         "max_outer_iterations": 4,
+        "min_score_threshold": 90.0,
+        "max_high_severity_issues": 0,
         "history": [],
         "best_code": code,
         "best_score": score,

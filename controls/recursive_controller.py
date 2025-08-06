@@ -29,6 +29,8 @@ class CodeState(TypedDict):
     best_refined_issues: List[dict]
     enable_optimization: bool
     optimization_applied: bool
+    min_score_threshold: float
+    max_high_severity_issues: int
 
 
 def build_langgraph_loop():
@@ -41,6 +43,8 @@ def build_langgraph_loop():
         max_outer_iterations = state.get("max_outer_iterations", 4)
         enable_optimization = state.get("enable_optimization", True)
         optimization_applied = state.get("optimization_applied", False)
+        min_score_threshold = state.get("min_score_threshold", 90.0)
+        max_high_severity_issues = state.get("max_high_severity_issues", 0)
 
         print(f"\n🔁 Outer Iteration {outer_iteration} (User approved)\n")
 
@@ -71,18 +75,17 @@ def build_langgraph_loop():
         # Step 6: Optimization (optional final phase)
         final_code = refactored_code
         optimization_suggestions = []
-        
+
         if enable_optimization and not optimization_applied and outer_iteration >= max_outer_iterations - 1:
             print("\n🚀 Running Optimization Agent as final phase...")
             optimization_suggestions = run_optimization_agent(refactored_code, api_key)
-            
+
             if optimization_suggestions:
                 print(f"\n📈 Optimization Suggestions:")
                 for suggestion in optimization_suggestions:
                     print(f"   Line {suggestion.get('line', 'N/A')}: {suggestion.get('description', '')}")
                     print(f"   ➜ {suggestion.get('suggestion', '')}")
-                
-                # Apply optimization suggestions through refactor agent
+
                 optimization_issues = [
                     {
                         "line": suggestion.get("line", 0),
@@ -94,7 +97,7 @@ def build_langgraph_loop():
                     }
                     for suggestion in optimization_suggestions
                 ]
-                
+
                 final_code = run_refactor_agent(refactored_code, optimization_issues, api_key)
                 optimization_applied = True
                 print("✅ Optimization applied to final code.")
@@ -115,6 +118,9 @@ def build_langgraph_loop():
         elif score <= prev_score:
             no_improvement_count += 1
 
+        # Count high-severity issues
+        high_severity_count = len([issue for issue in refined_issues if issue.get("severity") == "high"])
+
         # Save history
         history.append({
             "iteration": f"{outer_iteration}.0",
@@ -126,7 +132,12 @@ def build_langgraph_loop():
         })
 
         # Control loop continuation
-        continue_loop = (outer_iteration + 1 < max_outer_iterations) and (no_improvement_count < 2)
+        continue_loop = (
+                outer_iteration + 1 < max_outer_iterations and
+                no_improvement_count < 2 and
+                score < min_score_threshold
+                #high_severity_count > max_high_severity_issues
+        )
 
         return {
             "code": final_code,
@@ -143,7 +154,9 @@ def build_langgraph_loop():
             "max_outer_iterations": max_outer_iterations,
             "best_refined_issues": best_refined_issues,
             "enable_optimization": enable_optimization,
-            "optimization_applied": optimization_applied
+            "optimization_applied": optimization_applied,
+            "min_score_threshold": min_score_threshold,
+            "max_high_severity_issues": max_high_severity_issues
         }
 
     def should_continue(state: CodeState) -> Literal["refine", "end"]:

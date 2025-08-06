@@ -1,3 +1,5 @@
+import os
+
 def detect_language(file_path):
     extension_map = {
         '.py': 'Python',
@@ -10,6 +12,9 @@ def detect_language(file_path):
         '.rb': 'Ruby',
         '.php': 'PHP',
         '.go': 'Go',
+        '.rs': 'Rust',
+        '.kt': 'Kotlin',
+        '.swift': 'Swift'
     }
 
     for ext, lang in extension_map.items():
