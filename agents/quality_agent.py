@@ -2,9 +2,9 @@ import json
 from llm.gemini_client import init_gemini
 
 def run_quality_agent(code, api_key):
-    print("\n🔍 Running QualityAgent...")
+    print("🔍 Running Quality Agent...")
 
-    gemini = init_gemini(api_key)
+    gemini = init_gemini()
 
     with open("prompts/quality_prompt.txt", "r") as f:
         prompt_template = f.read()
@@ -22,11 +22,10 @@ def run_quality_agent(code, api_key):
         print("Raw output:\n", response.text)
         return {}
 
-    print(f"✅ QualityAgent Score: {result.get('score')}")
-    # Inside for loop where issues are appended
+    print(f"✅ Quality Agent completed - Score: {result.get('score')}/100")
+    
+    # Process issues with better structure
     for issue in result.get("issues", []):
-        print(f"⚠️ Line {issue['line']}: {issue['issue']} ➜ {issue['suggestion']}")
-
         # Add severity and confidence estimation (mock logic)
         issue["severity"] = "high" if "security" in issue["issue"].lower() else "medium"
         issue["confidence"] = 0.9  # Default for LLM suggestions

@@ -4,7 +4,7 @@ import tempfile
 import os
 
 def run_static_analysis(file_path):
-    print("\n🔎 Running Static Analysis Agent...")
+    print("🔎 Running Static Analysis...")
 
     all_issues = []
 
@@ -12,7 +12,7 @@ def run_static_analysis(file_path):
     all_issues += run_bandit(file_path)
     # Optional: all_issues += run_semgrep(file_path)
 
-    print(f"✅ Static Analysis found {len(all_issues)} issues.")
+    print(f"✅ Static Analysis completed - Found {len(all_issues)} issues")
     return all_issues
 
 def run_pylint(file_path):

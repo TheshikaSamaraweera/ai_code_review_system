@@ -15,11 +15,10 @@ def run_control_agent(code, language):
     print(f"➡️ Language: {language}")
     print("🧩 Phase 1: Analyze Only...\n")
 
-    # Replace QualityAgent stub with real call
-    from os import getenv
-    api_key = "AIzaSyDaW3FIrAlu3Kf_iLIDt8j5wlOw3lXTDiY"
+    # Load API key from environment
+    api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        print("❌ No API key provided.")
+        print("❌ GEMINI_API_KEY environment variable not set.")
         return
 
     # Run Quality Agent

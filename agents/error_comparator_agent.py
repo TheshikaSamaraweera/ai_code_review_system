@@ -1,5 +1,5 @@
 def compare_issues(ai_issues, static_issues):
-    print("\n🧮 Running Error Comparator Agent...")
+    print("🧮 Running Error Comparator...")
 
     merged = []
     seen = set()
@@ -33,9 +33,10 @@ def compare_issues(ai_issues, static_issues):
                 "source": "Static"
             })
 
-    print(f"\n🧾 Merged Total Issues: {len(merged)}")
+    # Calculate statistics
     count = {"AI": 0, "Static": 0, "Both": 0}
     for m in merged:
         count[m["source"]] += 1
-    print(f"   🔍 AI-only: {count['AI']} | 📎 Static-only: {count['Static']} | 🤝 Both: {count['Both']}")
+    
+    print(f"✅ Error Comparator completed - Merged {len(merged)} issues (AI: {count['AI']}, Static: {count['Static']}, Both: {count['Both']})")
     return merged
