@@ -3,16 +3,23 @@ import json
 import tempfile
 import os
 from utils.language_detector import detect_language
+from utils.cache_manager import load_cached_results, save_cached_results
 
 def run_static_analysis(file_path):
     print("🔎 Running Static Analysis...")
     language = detect_language(file_path)
-    all_issues = []
+    code = open(file_path, 'r').read()
 
-    # Create temporary file with appropriate extension
+    # Check cache
+    cached_results = load_cached_results(code)
+    if cached_results:
+        print(f"✅ Using cached static analysis results - Found {len(cached_results)} issues")
+        return cached_results
+
+    all_issues = []
     extension = os.path.splitext(file_path)[1] or '.py'
     with tempfile.NamedTemporaryFile(suffix=extension, delete=False, mode="w") as temp_file:
-        temp_file.write(open(file_path, 'r').read())
+        temp_file.write(code)
         temp_path = temp_file.name
 
     if language == "Python":
@@ -22,9 +29,9 @@ def run_static_analysis(file_path):
         all_issues += run_eslint(temp_path)
     elif language == "Java":
         all_issues += run_checkstyle(temp_path)
-    # Add more languages as needed
 
     os.remove(temp_path)
+    save_cached_results(code, all_issues)
     print(f"✅ Static Analysis completed - Found {len(all_issues)} issues")
     return all_issues
 
@@ -111,7 +118,6 @@ def run_checkstyle(file_path):
             text=True,
             timeout=10
         )
-        # Parse Checkstyle output (simplified)
         lines = result.stdout.splitlines()
         for line in lines:
             if "ERROR" in line:
