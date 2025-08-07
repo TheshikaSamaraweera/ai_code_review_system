@@ -18,13 +18,7 @@ def run_critic_agent(code, merged_issues, api_key):
 
     try:
         response = gemini.generate_content(prompt)
-    except Exception as e:
-        print("❌ Gemini call failed:", e)
-        return merged_issues
-
-    try:
-        raw_output = response.text.strip()
-        json_str = raw_output.split("```json")[-1].split("```")[0].strip() if "```json" in raw_output else raw_output
+        json_str = response.text.strip().split("```json")[-1].split("```")[0].strip() if "```json" in response.text else response.text
         result = json.loads(json_str)
         refined_issues = result.get("improved_issues", [])
     except Exception as e:
@@ -37,10 +31,10 @@ def run_critic_agent(code, merged_issues, api_key):
         return merged_issues
 
     for issue in refined_issues:
-        if "explanation" not in issue:
-            issue["explanation"] = "No specific explanation provided by the model."
+        issue.setdefault("explanation", "No specific explanation provided by the model.")
         issue.setdefault("severity", "medium")
         issue.setdefault("confidence", 0.85)
+        issue.setdefault("priority", 0.8 if issue["severity"] == "high" else 0.6)
         remember_issue(issue)
 
     print(f"✅ Critic Agent provided {len(refined_issues)} refined issues.")

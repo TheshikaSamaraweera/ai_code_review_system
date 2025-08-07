@@ -1,5 +1,6 @@
 import os
 import tempfile
+import json
 from utils.file_loader import load_file
 from agents.quality_agent import run_quality_agent
 from agents.static_analysis_agent import run_static_analysis
@@ -12,6 +13,7 @@ from dotenv import load_dotenv
 def format_initial_analysis_report(quality_results, static_results, merged_issues, code_path):
     score = quality_results.get("score", 0)
     ai_issues = quality_results.get("issues", [])
+    static_issues = static_results
 
     total_issues = len(merged_issues)
     ai_only_issues = len([i for i in merged_issues if i.get("source") == "AI"])
@@ -54,6 +56,11 @@ def format_initial_analysis_report(quality_results, static_results, merged_issue
     else:
         sources = {"AI": [], "Static": [], "Both": []}
         for issue in merged_issues:
+            # Ensure all required fields are present
+            issue.setdefault("explanation", "No specific explanation provided.")
+            issue.setdefault("severity", "medium")
+            issue.setdefault("confidence", 0.8)
+            issue.setdefault("priority", 0.8 if issue["severity"] == "high" else 0.6)
             source = issue.get("source", "AI")
             sources[source].append(issue)
 
@@ -64,17 +71,16 @@ def format_initial_analysis_report(quality_results, static_results, merged_issue
                 report += "-" * 60 + "\n"
 
                 for i, issue in enumerate(issues, 1):
-                    line_num = issue.get("line", "N/A")
-                    description = issue.get("description", "No description")
-                    suggestion = issue.get("suggestion", "No suggestion")
-                    severity = issue.get("severity", "medium")
-                    confidence = issue.get("confidence", 0.8)
-                    severity_icon = "🔴" if severity == "high" else "🟡" if severity == "medium" else "🟢"
-
-                    report += f"{i:2d}. Line {line_num:3d} | {severity_icon} {severity.upper()}\n"
-                    report += f"    📝 Issue: {description}\n"
-                    report += f"    💡 Suggestion: {suggestion}\n"
-                    report += f"    🎯 Confidence: {confidence:.1%}\n"
+                    issue_json = {
+                        "line": issue.get("line", 0),
+                        "description": issue.get("description", issue.get("issue", "No description")),
+                        "suggestion": issue.get("suggestion", "No suggestion provided"),
+                        "explanation": issue.get("explanation", "No specific explanation provided"),
+                        "severity": issue.get("severity", "medium"),
+                        "confidence": issue.get("confidence", 0.8),
+                        "priority": issue.get("priority", 0.6)
+                    }
+                    report += f"{i:2d}. {json.dumps(issue_json, indent=2)}\n"
                     report += "\n"
 
     report += f"{'=' * 80}\n"
