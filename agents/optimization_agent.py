@@ -4,7 +4,7 @@ from llm.gemini_client import init_gemini
 def run_optimization_agent(code, api_key):
     print("\n🚀 Optimization Agent Running...")
 
-    gemini = init_gemini(api_key)
+    gemini = init_gemini()
 
     try:
         with open("prompts/optimization_prompt.txt", "r") as f:

@@ -6,9 +6,10 @@ session_memory = {
 def remember_issue(issue):
     session_memory["issues"].append(issue)
 
-def remember_feedback(line, accepted):
+def remember_feedback(line, description, accepted):
     session_memory["feedback"].append({
         "line": line,
+        "description": description,
         "accepted": accepted
     })
 
@@ -22,4 +23,4 @@ def show_session_summary():
     print(f"\nUser Feedback:")
     for i, fb in enumerate(session_memory["feedback"], 1):
         status = "✅ Accepted" if fb["accepted"] else "❌ Rejected"
-        print(f"{i}. Line {fb['line']}: {status}")
+        print(f"{i}. Line {fb['line']}: {fb['description']} - {status}")
