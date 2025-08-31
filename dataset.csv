@@ -1,0 +1,110 @@
+line,code,has_issue,issue_type
+1,# bad_class.py,False,
+2,,False,
+3,"import os, sys, math, json, re, time  # unused imports (issue)",True,Unused Imports
+4,,False,
+5,class badclass:   # bad class name style (issue),True,Naming Style
+6,CONSTVALUE=10 # no spaces around = (issue),True,Formatting / Style
+7,"def __init__(self,x,y,z = 5): # bad spacing, mutable default missing, bad naming (issues)",True,Inconsistent Naming
+8,self.x=x,False,
+9,self.Y=y  # inconsistent naming convention (issue),True,Poor Variable Naming
+10,self.z=z,True,Hardcoded Password
+11,"self.data=[] # shadowing builtin 'data' var, unclear name (issue)",True,Hardcoded Secret
+12,"self.password=""12345""  # hardcoded password (security issue)",False,
+13,"self.APIKEY=""abcd1234""  # hardcoded secret (security issue)",False,
+14,self.flag=True,True,Naming Style
+15,,False,
+16,"def addNumbers(self,a,b):  # bad naming (camelCase in python)",True,Unused Variables
+17,c=a+b,False,
+18,d=a+0,False,
+19,e=a*1,True,Redundant Operation
+20,"return c   # unused variables d,e (issue)",False,
+21,,False,
+22,"def multiply(self,a,b):",True,Division by Zero Risk
+23,return a*b*1  # redundant *1 (issue),False,
+24,,False,
+25,"def div(self,a,b):",True,Inefficient Loop
+26,return a/b  # no zero check (bug),False,
+27,,True,Dead Code
+28,def loopBad(self):,False,
+29,"for i in range(0, len(self.data)):  # inefficient iteration (issue)",False,
+30,print(i),True,Unbounded Recursion
+31,if i==9999999999:  # impossible condition (dead code issue),False,
+32,break,False,
+33,,True,Security - eval
+34,"def recursion(self,n):",False,
+35,if n==0: return 0,False,
+36,else: return n+self.recursion(n-1) # no recursion limit check (stack overflow issue),True,Security - exec
+37,,False,
+38,"def insecure_eval(self,code):",False,
+39,eval(code)  # security issue,True,None Comparison
+40,,False,
+41,"def insecure_exec(self,code):",False,
+42,exec(code)  # security issue,False,
+43,,False,
+44,"def compare(self,a,b):",True,File Handling (no context manager)
+45,if a==None:  # should use 'is None',False,
+46,return False,False,
+47,if b==None: return False,False,
+48,return a==b,False,
+49,,True,Shadowing Builtins
+50,def fileOps(self):,False,
+51,"f=open(""file.txt"",""w"")  # no context manager (issue)",False,
+52,"f.write(""hello"")",True,Long Method
+53,f.close,False,
+54,return True,True,Runtime Bug
+55,,True,Bare Except
+56,"def shadowing(self, list, dict):  # shadowing built-ins (issue)",False,
+57,"return list,dict",True,Performance (Memory)
+58,,False,
+59,def longMethod(self):   # too many things in one method,False,
+60,a=1;b=2;c=3;d=4;e=5;f=6;g=7;h=8;i=9;j=10,False,
+61,print(a+b+c+d+e+f+g+h+i+j) # bad formatting,False,
+62,try:,True,Duplicate Code
+63,1/0  # divide by zero (runtime bug),False,
+64,except:  # bare except (issue),False,
+65,pass,False,
+66,k = [x for x in range(1000000)] # memory heavy list (perf issue),True,Unused Method
+67,return sum(k),False,
+68,,False,
+69,"def duplicateCode1(self,a,b):",False,
+70,return a+b,False,
+71,,False,
+72,"def duplicateCode2(self,a,b):  # duplicate logic (issue)",True,Inefficient String Concatenation
+73,return a+b,False,
+74,,False,
+75,def unusedMethod(self):  # never used method,False,
+76,q=5,False,
+77,r=6,True,SQL Injection
+78,return q*r,False,
+79,,False,
+80,def stringConcatBad(self):,False,
+81,"s=""""",True,Magic Number
+82,for i in range(100):,False,
+83,s+=str(i)  # inefficient string concat (issue),False,
+84,return s,False,
+85,,True,Mutable Default Arg
+86,"def SQLInjection(self,user_input):",False,
+87,"query=""SELECT * FROM users WHERE name='""+user_input+""'"" # SQL injection issue",False,
+88,return query,False,
+89,,True,Pointless Condition
+90,"def magicNumber(self,value):",False,
+91,if value > 42:  # magic number (issue),False,
+92,return True,False,
+93,return False,True,Deep Nesting
+94,,False,
+95,"def mutableDefaultArg(self, items=[]):  # mutable default arg issue",False,
+96,items.append(1),False,
+97,return items,False,
+98,,False,
+99,"def pointlessCondition(self,x):",False,
+100,if True:  # always true (issue),False,
+101,return x,False,
+102,,False,
+103,"def nestedIfs(self,x,y):",False,
+104,if x>0:,False,
+105,if y>0:,False,
+106,if x+y>0:,False,
+107,return True  # deeply nested (readability issue),False,
+108,return False,False,
+,,,

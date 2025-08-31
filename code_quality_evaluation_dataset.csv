@@ -1,0 +1,1156 @@
+sample_id,line,code,has_issue,issue_type
+clean_0,1,class UserManager:,False,none
+clean_0,2,"    """"""Secure user management system.""""""",False,none
+clean_0,4,    def __init__(self):,False,none
+clean_0,5,        self._users = {},False,none
+clean_0,6,        self._active_sessions = set(),False,none
+clean_0,8,"    def create_user(self, username: str, email: str, password: str) -> bool:",False,none
+clean_0,9,"        """"""Create a new user with validation.""""""",False,none
+clean_0,10,        if not self._validate_username(username):,False,none
+clean_0,11,"            raise ValueError(""Invalid username format"")",False,none
+clean_0,13,        if not self._validate_email(email):,False,none
+clean_0,14,"            raise ValueError(""Invalid email format"")",False,none
+clean_0,16,        if username in self._users:,False,none
+clean_0,17,"            raise ValueError(""Username already exists"")",False,none
+clean_0,19,        self._users[username] = {,False,none
+clean_0,20,"            ""email"": email,",False,none
+clean_0,21,"            ""password_hash"": self._hash_password(password),",False,none
+clean_0,22,"            ""created_at"": ""2024-01-01"",  # Simplified for example",False,none
+clean_0,23,"            ""active"": True",False,none
+clean_0,24,        },False,none
+clean_0,25,        return True,False,none
+clean_0,27,"    def authenticate(self, username: str, password: str) -> bool:",False,none
+clean_0,28,"        """"""Authenticate user credentials.""""""",False,none
+clean_0,29,        if username not in self._users:,False,none
+clean_0,30,            return False,False,none
+clean_0,32,        user = self._users[username],False,none
+clean_0,33,"        if not user[""active""]:",False,none
+clean_0,34,            return False,False,none
+clean_0,36,"        return user[""password_hash""] == self._hash_password(password)",False,none
+clean_0,38,"    def _validate_username(self, username: str) -> bool:",False,none
+clean_0,39,"        """"""Validate username format.""""""",False,none
+clean_0,40,        return (,False,none
+clean_0,41,"            isinstance(username, str) and",False,none
+clean_0,42,            3 <= len(username) <= 20 and,False,none
+clean_0,43,            username.isalnum(),False,none
+clean_0,44,        ),False,none
+clean_0,46,"    def _validate_email(self, email: str) -> bool:",False,none
+clean_0,47,"        """"""Basic email validation.""""""",False,none
+clean_0,48,        return (,False,none
+clean_0,49,"            isinstance(email, str) and",False,none
+clean_0,50,"            ""@"" in email and",False,none
+clean_0,51,"            ""."" in email.split(""@"")[-1]",False,none
+clean_0,52,        ),False,none
+clean_0,54,"    def _hash_password(self, password: str) -> str:",False,none
+clean_0,55,"        """"""Simple password hashing (use proper hashing in production).""""""",False,none
+clean_0,56,"        return f""hashed_{hash(password)}""",False,none
+problematic_0,1,# FIXME: Security vulnerabilities in user management,True,incomplete_code
+problematic_0,2,"import pickle, os  # Security risk with pickle",False,other
+problematic_0,3,from hashlib import *  # Wildcard import,True,security_risk
+problematic_0,5,users = {}  # Global mutable state,False,other
+problematic_0,6,current_user = None  # Global state,False,other
+problematic_0,8,class usermanager:  # Poor naming convention,False,other
+problematic_0,9,    def __init__(self):,False,other
+problematic_0,10,        # TODO: Load users from secure storage,True,incomplete_code
+problematic_0,11,        self.users = users  # Reference to global,False,other
+problematic_0,12,"        self.admin = ""admin""  # Hardcoded admin",False,other
+problematic_0,13,"        print(""UserManager started"")  # Debug print",True,debug_code
+problematic_0,15,"    def createUser(self, name, pwd, email=""""):  # camelCase, poor param names",False,other
+problematic_0,16,        # XXX: No password strength validation,True,incomplete_code
+problematic_0,17,"        if name == """":  # Poor string check",False,other
+problematic_0,18,            return False,False,other
+problematic_0,20,        if name in self.users:,False,other
+problematic_0,21,"            print(""User exists"")  # Poor error handling",True,debug_code
+problematic_0,22,            return False,False,other
+problematic_0,24,        # HACK: Simple password storage (MAJOR SECURITY ISSUE),True,incomplete_code
+problematic_0,25,        user_data = {,False,other
+problematic_0,26,"            ""password"": pwd,  # Storing plaintext password!",False,other
+problematic_0,27,"            ""email"": email,",False,other
+problematic_0,28,"            ""role"": ""user"",",False,other
+problematic_0,29,"            ""active"": True",False,other
+problematic_0,30,        },False,other
+problematic_0,32,        self.users[name] = user_data,False,other
+problematic_0,33,"        print(f""Created user: {name}"")  # Logging sensitive info",True,debug_code
+problematic_0,34,        return True,False,other
+problematic_0,36,"    def login(self, name, pwd):",False,other
+problematic_0,37,        # TODO: Implement session management,True,incomplete_code
+problematic_0,38,        try:,False,other
+problematic_0,39,            if name in self.users:,False,other
+problematic_0,40,"                if self.users[name][""password""] == pwd:  # Plaintext comparison",False,other
+problematic_0,41,                    global current_user  # Global variable modification,True,poor_practice
+problematic_0,42,                    current_user = name,False,other
+problematic_0,43,"                    print(f""User {name} logged in"")  # Logging",True,debug_code
+problematic_0,44,                    return True,False,other
+problematic_0,45,                else:,False,other
+problematic_0,46,                    return False,False,other
+problematic_0,47,            else:,False,other
+problematic_0,48,                return False,False,other
+problematic_0,49,        except Exception:  # Too broad exception,True,poor_exception_handling
+problematic_0,50,"            print(""Login error"")",True,debug_code
+problematic_0,51,            return False,False,other
+problematic_0,53,"    def deleteUser(self, name):  # Destructive operation",False,other
+problematic_0,54,        # FIXME: No confirmation or authorization check,True,incomplete_code
+problematic_0,55,        if name in self.users:,False,other
+problematic_0,56,            del self.users[name],False,other
+problematic_0,57,"            print(f""Deleted user: {name}"")  # Logging sensitive operation",True,debug_code
+problematic_0,58,            return True,False,other
+problematic_0,59,        return False,False,other
+problematic_0,61,"    def saveUsers(self, filename=""users.pkl""):  # Security risk with pickle",False,other
+problematic_0,62,        try:,False,other
+problematic_0,63,"            f = open(filename, ""wb"")  # No context manager",False,other
+problematic_0,64,"            pickle.dump(self.users, f)  # Pickle security risk",False,other
+problematic_0,65,            f.close(),False,other
+problematic_0,66,        except:  # Bare except,True,poor_exception_handling
+problematic_0,67,            pass  # Silent failure,False,other
+problematic_0,69,"    def loadUsers(self, filename=""users.pkl""):",False,other
+problematic_0,70,        # HACK: Loading pickled data (security risk),True,incomplete_code
+problematic_0,71,        try:,False,other
+problematic_0,72,            if os.path.exists(filename):,False,other
+problematic_0,73,"                f = open(filename, ""rb"")",False,other
+problematic_0,74,                self.users = pickle.load(f)  # Pickle deserialization risk,False,other
+problematic_0,75,                f.close(),False,other
+problematic_0,76,        except:,True,poor_exception_handling
+problematic_0,77,"            print(""Could not load users"")",True,debug_code
+problematic_0,78,            self.users = {},False,other
+problematic_0,80,"    def __getitem__(self, key):  # Unnecessary magic method",False,other
+problematic_0,81,"        return self.users.get(key, None)",False,other
+problematic_0,83,# Insecure global function,True,poor_practice
+problematic_0,84,"def admin_access(username, action):",False,other
+problematic_0,85,    # XXX: No proper authorization,True,incomplete_code
+problematic_0,86,"    if username == ""admin"":",False,other
+problematic_0,87,        exec(action)  # MAJOR SECURITY RISK: arbitrary code execution,True,security_risk
+problematic_0,88,        return True,False,other
+problematic_0,89,    return False,False,other
+clean_1,1,class TaskManager:,False,none
+clean_1,2,"    """"""Efficient task management with priority handling.""""""",False,none
+clean_1,4,    def __init__(self):,False,none
+clean_1,5,        self._tasks = {},False,none
+clean_1,6,        self._next_id = 1,False,none
+clean_1,8,"    def add_task(self, title: str, description: str = """", priority: str = ""medium"") -> int:",False,none
+clean_1,9,"        """"""Add a new task with validation.""""""",False,none
+clean_1,10,        if not title.strip():,False,none
+clean_1,11,"            raise ValueError(""Task title cannot be empty"")",False,none
+clean_1,13,"        valid_priorities = {""low"", ""medium"", ""high"", ""urgent""}",False,none
+clean_1,14,        if priority not in valid_priorities:,False,none
+clean_1,15,"            raise ValueError(f""Priority must be one of: {valid_priorities}"")",False,none
+clean_1,17,        task_id = self._next_id,False,none
+clean_1,18,        self._tasks[task_id] = {,False,none
+clean_1,19,"            ""title"": title.strip(),",False,none
+clean_1,20,"            ""description"": description.strip(),",False,none
+clean_1,21,"            ""priority"": priority,",False,none
+clean_1,22,"            ""completed"": False",False,none
+clean_1,23,        },False,none
+clean_1,24,        self._next_id += 1,False,none
+clean_1,25,        return task_id,False,none
+clean_1,27,"    def complete_task(self, task_id: int) -> bool:",False,none
+clean_1,28,"        """"""Mark a task as completed.""""""",False,none
+clean_1,29,        if task_id not in self._tasks:,False,none
+clean_1,30,"            raise KeyError(f""Task {task_id} not found"")",False,none
+clean_1,32,"        self._tasks[task_id][""completed""] = True",False,none
+clean_1,33,        return True,False,none
+clean_1,35,"    def get_pending_tasks(self) -> Dict[int, Dict]:",False,none
+clean_1,36,"        """"""Get all incomplete tasks.""""""",False,none
+clean_1,37,        return {,False,none
+clean_1,38,"            tid: task for tid, task in self._tasks.items() ",False,none
+clean_1,39,"            if not task[""completed""]",False,none
+clean_1,40,        },False,none
+clean_1,42,"    def get_tasks_by_priority(self, priority: str) -> Dict[int, Dict]:",False,none
+clean_1,43,"        """"""Get tasks filtered by priority level.""""""",False,none
+clean_1,44,        return {,False,none
+clean_1,45,"            tid: task for tid, task in self._tasks.items() ",False,none
+clean_1,46,"            if task[""priority""] == priority",False,none
+clean_1,47,        },False,none
+problematic_1,1,# FIXME: Rewrite this entire task manager,True,incomplete_code
+problematic_1,2,from os import *  # Wildcard import,True,security_risk
+problematic_1,3,"import sys, json, pickle  # Multiple imports",False,other
+problematic_1,5,DEBUG = True  # Global constant,False,other
+problematic_1,6,tasks = []  # Global mutable state,False,other
+problematic_1,8,class TaskManager:  # Missing docstring,False,other
+problematic_1,9,    def __init__(self):,False,other
+problematic_1,10,        self.tasks = {},False,other
+problematic_1,11,        self.id = 1  # Poor naming (shadows built-in),False,other
+problematic_1,12,        self.count = 0,False,other
+problematic_1,13,"        print(""TaskManager initialized"")  # Debug print",True,debug_code
+problematic_1,15,"    def addTask(self, title, desc="""", pri=""med""):  # camelCase, poor names",False,other
+problematic_1,16,        # TODO: Add proper validation,True,incomplete_code
+problematic_1,17,"        if title == """":  # String comparison with ==",False,other
+problematic_1,18,            return None,False,other
+problematic_1,19,"        if pri not in [""low"", ""med"", ""high""]:",False,other
+problematic_1,20,"            pri = ""med""  # Silent failure instead of raising exception",False,other
+problematic_1,22,        task = {}  # Could use dataclass or namedtuple,False,other
+problematic_1,23,"        task[""title""] = title",False,other
+problematic_1,24,"        task[""desc""] = desc",False,other
+problematic_1,25,"        task[""priority""] = pri",False,other
+problematic_1,26,"        task[""done""] = False",False,other
+problematic_1,27,"        task[""id""] = self.id",False,other
+problematic_1,29,        self.tasks[self.id] = task,False,other
+problematic_1,30,        self.id = self.id + 1  # Verbose increment,False,other
+problematic_1,31,        self.count += 1,False,other
+problematic_1,33,        # XXX: This logging is problematic,True,incomplete_code
+problematic_1,34,"        print(f""Added task: {title}"")",True,debug_code
+problematic_1,35,        return self.id - 1,False,other
+problematic_1,37,"    def completeTask(self, id):  # Shadows built-in 'id'",False,other
+problematic_1,38,        # HACK: Quick implementation,True,incomplete_code
+problematic_1,39,        try:,False,other
+problematic_1,40,            if id in self.tasks:,False,other
+problematic_1,41,"                self.tasks[id][""done""] = True",False,other
+problematic_1,42,                self.count = self.count - 1,False,other
+problematic_1,43,                return True,False,other
+problematic_1,44,            else:,False,other
+problematic_1,45,                return False,False,other
+problematic_1,46,        except Exception:  # Too broad exception handling,True,poor_exception_handling
+problematic_1,47,"            print(""Error completing task"")",True,debug_code
+problematic_1,48,            return False,False,other
+problematic_1,50,    def getTasks(self):  # camelCase,False,other
+problematic_1,51,        # TODO: Filter by status,True,incomplete_code
+problematic_1,52,        return self.tasks,False,other
+problematic_1,54,    def deleteTasks(self):  # Destructive operation without confirmation,False,other
+problematic_1,55,        self.tasks = {},False,other
+problematic_1,56,        self.count = 0,False,other
+problematic_1,57,"        print(""All tasks deleted"")  # Side effect",True,debug_code
+problematic_1,59,    def __str__(self):,False,other
+problematic_1,60,"        return f""TaskManager with {len(self.tasks)} tasks""  # Inconsistent with self.count",False,other
+problematic_1,62,# Global helper function,False,other
+problematic_1,63,def save_tasks(manager):,False,other
+problematic_1,64,    # FIXME: Hardcoded filename,True,incomplete_code
+problematic_1,65,    try:,False,other
+problematic_1,66,"        with open(""tasks.json"", ""w"") as f:",False,other
+problematic_1,67,"            json.dump(manager.tasks, f)",False,other
+problematic_1,68,    except:  # Bare except,True,poor_exception_handling
+problematic_1,69,        pass  # Silent failure,False,other
+clean_2,1,class UserManager:,False,none
+clean_2,2,"    """"""Secure user management system.""""""",False,none
+clean_2,4,    def __init__(self):,False,none
+clean_2,5,        self._users = {},False,none
+clean_2,6,        self._active_sessions = set(),False,none
+clean_2,8,"    def create_user(self, username: str, email: str, password: str) -> bool:",False,none
+clean_2,9,"        """"""Create a new user with validation.""""""",False,none
+clean_2,10,        if not self._validate_username(username):,False,none
+clean_2,11,"            raise ValueError(""Invalid username format"")",False,none
+clean_2,13,        if not self._validate_email(email):,False,none
+clean_2,14,"            raise ValueError(""Invalid email format"")",False,none
+clean_2,16,        if username in self._users:,False,none
+clean_2,17,"            raise ValueError(""Username already exists"")",False,none
+clean_2,19,        self._users[username] = {,False,none
+clean_2,20,"            ""email"": email,",False,none
+clean_2,21,"            ""password_hash"": self._hash_password(password),",False,none
+clean_2,22,"            ""created_at"": ""2024-01-01"",  # Simplified for example",False,none
+clean_2,23,"            ""active"": True",False,none
+clean_2,24,        },False,none
+clean_2,25,        return True,False,none
+clean_2,27,"    def authenticate(self, username: str, password: str) -> bool:",False,none
+clean_2,28,"        """"""Authenticate user credentials.""""""",False,none
+clean_2,29,        if username not in self._users:,False,none
+clean_2,30,            return False,False,none
+clean_2,32,        user = self._users[username],False,none
+clean_2,33,"        if not user[""active""]:",False,none
+clean_2,34,            return False,False,none
+clean_2,36,"        return user[""password_hash""] == self._hash_password(password)",False,none
+clean_2,38,"    def _validate_username(self, username: str) -> bool:",False,none
+clean_2,39,"        """"""Validate username format.""""""",False,none
+clean_2,40,        return (,False,none
+clean_2,41,"            isinstance(username, str) and",False,none
+clean_2,42,            3 <= len(username) <= 20 and,False,none
+clean_2,43,            username.isalnum(),False,none
+clean_2,44,        ),False,none
+clean_2,46,"    def _validate_email(self, email: str) -> bool:",False,none
+clean_2,47,"        """"""Basic email validation.""""""",False,none
+clean_2,48,        return (,False,none
+clean_2,49,"            isinstance(email, str) and",False,none
+clean_2,50,"            ""@"" in email and",False,none
+clean_2,51,"            ""."" in email.split(""@"")[-1]",False,none
+clean_2,52,        ),False,none
+clean_2,54,"    def _hash_password(self, password: str) -> str:",False,none
+clean_2,55,"        """"""Simple password hashing (use proper hashing in production).""""""",False,none
+clean_2,56,"        return f""hashed_{hash(password)}""",False,none
+problematic_2,1,# FIXME: Security vulnerabilities in user management,True,incomplete_code
+problematic_2,2,"import pickle, os  # Security risk with pickle",False,other
+problematic_2,3,from hashlib import *  # Wildcard import,True,security_risk
+problematic_2,5,users = {}  # Global mutable state,False,other
+problematic_2,6,current_user = None  # Global state,False,other
+problematic_2,8,class usermanager:  # Poor naming convention,False,other
+problematic_2,9,    def __init__(self):,False,other
+problematic_2,10,        # TODO: Load users from secure storage,True,incomplete_code
+problematic_2,11,        self.users = users  # Reference to global,False,other
+problematic_2,12,"        self.admin = ""admin""  # Hardcoded admin",False,other
+problematic_2,13,"        print(""UserManager started"")  # Debug print",True,debug_code
+problematic_2,15,"    def createUser(self, name, pwd, email=""""):  # camelCase, poor param names",False,other
+problematic_2,16,        # XXX: No password strength validation,True,incomplete_code
+problematic_2,17,"        if name == """":  # Poor string check",False,other
+problematic_2,18,            return False,False,other
+problematic_2,20,        if name in self.users:,False,other
+problematic_2,21,"            print(""User exists"")  # Poor error handling",True,debug_code
+problematic_2,22,            return False,False,other
+problematic_2,24,        # HACK: Simple password storage (MAJOR SECURITY ISSUE),True,incomplete_code
+problematic_2,25,        user_data = {,False,other
+problematic_2,26,"            ""password"": pwd,  # Storing plaintext password!",False,other
+problematic_2,27,"            ""email"": email,",False,other
+problematic_2,28,"            ""role"": ""user"",",False,other
+problematic_2,29,"            ""active"": True",False,other
+problematic_2,30,        },False,other
+problematic_2,32,        self.users[name] = user_data,False,other
+problematic_2,33,"        print(f""Created user: {name}"")  # Logging sensitive info",True,debug_code
+problematic_2,34,        return True,False,other
+problematic_2,36,"    def login(self, name, pwd):",False,other
+problematic_2,37,        # TODO: Implement session management,True,incomplete_code
+problematic_2,38,        try:,False,other
+problematic_2,39,            if name in self.users:,False,other
+problematic_2,40,"                if self.users[name][""password""] == pwd:  # Plaintext comparison",False,other
+problematic_2,41,                    global current_user  # Global variable modification,True,poor_practice
+problematic_2,42,                    current_user = name,False,other
+problematic_2,43,"                    print(f""User {name} logged in"")  # Logging",True,debug_code
+problematic_2,44,                    return True,False,other
+problematic_2,45,                else:,False,other
+problematic_2,46,                    return False,False,other
+problematic_2,47,            else:,False,other
+problematic_2,48,                return False,False,other
+problematic_2,49,        except Exception:  # Too broad exception,True,poor_exception_handling
+problematic_2,50,"            print(""Login error"")",True,debug_code
+problematic_2,51,            return False,False,other
+problematic_2,53,"    def deleteUser(self, name):  # Destructive operation",False,other
+problematic_2,54,        # FIXME: No confirmation or authorization check,True,incomplete_code
+problematic_2,55,        if name in self.users:,False,other
+problematic_2,56,            del self.users[name],False,other
+problematic_2,57,"            print(f""Deleted user: {name}"")  # Logging sensitive operation",True,debug_code
+problematic_2,58,            return True,False,other
+problematic_2,59,        return False,False,other
+problematic_2,61,"    def saveUsers(self, filename=""users.pkl""):  # Security risk with pickle",False,other
+problematic_2,62,        try:,False,other
+problematic_2,63,"            f = open(filename, ""wb"")  # No context manager",False,other
+problematic_2,64,"            pickle.dump(self.users, f)  # Pickle security risk",False,other
+problematic_2,65,            f.close(),False,other
+problematic_2,66,        except:  # Bare except,True,poor_exception_handling
+problematic_2,67,            pass  # Silent failure,False,other
+problematic_2,69,"    def loadUsers(self, filename=""users.pkl""):",False,other
+problematic_2,70,        # HACK: Loading pickled data (security risk),True,incomplete_code
+problematic_2,71,        try:,False,other
+problematic_2,72,            if os.path.exists(filename):,False,other
+problematic_2,73,"                f = open(filename, ""rb"")",False,other
+problematic_2,74,                self.users = pickle.load(f)  # Pickle deserialization risk,False,other
+problematic_2,75,                f.close(),False,other
+problematic_2,76,        except:,True,poor_exception_handling
+problematic_2,77,"            print(""Could not load users"")",True,debug_code
+problematic_2,78,            self.users = {},False,other
+problematic_2,80,"    def __getitem__(self, key):  # Unnecessary magic method",False,other
+problematic_2,81,"        return self.users.get(key, None)",False,other
+problematic_2,83,# Insecure global function,True,poor_practice
+problematic_2,84,"def admin_access(username, action):",False,other
+problematic_2,85,    # XXX: No proper authorization,True,incomplete_code
+problematic_2,86,"    if username == ""admin"":",False,other
+problematic_2,87,        exec(action)  # MAJOR SECURITY RISK: arbitrary code execution,True,security_risk
+problematic_2,88,        return True,False,other
+problematic_2,89,    return False,False,other
+clean_3,1,class FileHandler:,False,none
+clean_3,2,"    """"""Safe file operations with proper error handling.""""""",False,none
+clean_3,4,"    def __init__(self, base_directory: str = ""./""):",False,none
+clean_3,5,        self._base_dir = base_directory,False,none
+clean_3,6,"        self._allowed_extensions = {"".txt"", "".json"", "".csv"", "".log""}",False,none
+clean_3,8,"    def read_file(self, filename: str) -> str:",False,none
+clean_3,9,"        """"""Safely read file contents.""""""",False,none
+clean_3,10,        if not self._is_safe_filename(filename):,False,none
+clean_3,11,"            raise ValueError(""Invalid filename"")",False,none
+clean_3,13,        try:,False,none
+clean_3,14,            full_path = self._get_safe_path(filename),False,none
+clean_3,15,"            with open(full_path, 'r', encoding='utf-8') as f:",False,none
+clean_3,16,                return f.read(),False,none
+clean_3,17,        except FileNotFoundError:,False,none
+clean_3,18,"            raise FileNotFoundError(f""File {filename} not found"")",False,none
+clean_3,19,        except PermissionError:,False,none
+clean_3,20,"            raise PermissionError(f""No permission to read {filename}"")",False,none
+clean_3,22,"    def write_file(self, filename: str, content: str) -> bool:",False,none
+clean_3,23,"        """"""Safely write content to file.""""""",False,none
+clean_3,24,        if not self._is_safe_filename(filename):,False,none
+clean_3,25,"            raise ValueError(""Invalid filename"")",False,none
+clean_3,27,        try:,False,none
+clean_3,28,            full_path = self._get_safe_path(filename),False,none
+clean_3,29,"            with open(full_path, 'w', encoding='utf-8') as f:",False,none
+clean_3,30,                f.write(content),False,none
+clean_3,31,            return True,False,none
+clean_3,32,        except PermissionError:,False,none
+clean_3,33,"            raise PermissionError(f""No permission to write {filename}"")",False,none
+clean_3,35,"    def _is_safe_filename(self, filename: str) -> bool:",False,none
+clean_3,36,"        """"""Validate filename for security.""""""",False,none
+clean_3,37,"        if not filename or "".."" in filename or ""/"" in filename:",False,none
+clean_3,38,            return False,False,none
+clean_3,40,"        extension = ""."" + filename.split(""."")[-1] if ""."" in filename else """"",False,none
+clean_3,41,        return extension.lower() in self._allowed_extensions,False,none
+clean_3,43,"    def _get_safe_path(self, filename: str) -> str:",False,none
+clean_3,44,"        """"""Get safe file path within base directory.""""""",False,none
+clean_3,45,"        return f""{self._base_dir.rstrip('/')}/{filename}""",False,none
+clean_3,47,    def list_files(self) -> List[str]:,False,none
+clean_3,48,"        """"""List all files in the base directory.""""""",False,none
+clean_3,49,        import os,False,none
+clean_3,50,        try:,False,none
+clean_3,51,            files = os.listdir(self._base_dir),False,none
+clean_3,52,            return [f for f in files if self._is_safe_filename(f)],False,none
+clean_3,53,        except OSError:,False,none
+clean_3,54,            return [],False,none
+problematic_3,1,# TODO: Fix all the security issues in this file handler,True,incomplete_code
+problematic_3,2,from os import *  # Wildcard import - security risk,True,security_risk
+problematic_3,3,"import shutil, pickle  # Multiple imports",False,other
+problematic_3,5,temp_files = []  # Global mutable state,False,other
+problematic_3,7,class filehandler:  # Poor naming convention,False,other
+problematic_3,8,"    def __init__(self, dir=""./""):  # Mutable default argument",False,other
+problematic_3,9,        # FIXME: No directory validation,True,incomplete_code
+problematic_3,10,        self.directory = dir,False,other
+problematic_3,11,        self.files = [],False,other
+problematic_3,12,        self.temp = temp_files  # Reference to global,False,other
+problematic_3,13,"        print(f""FileHandler for {dir}"")  # Debug print",True,debug_code
+problematic_3,15,"    def readFile(self, fname):  # camelCase, poor parameter name",False,other
+problematic_3,16,        # XXX: No path traversal protection,True,incomplete_code
+problematic_3,17,        try:,False,other
+problematic_3,18,            path = self.directory + fname  # Insecure path concatenation,False,other
+problematic_3,19,"            f = open(path, ""r"")  # No context manager",False,other
+problematic_3,20,            content = f.read(),False,other
+problematic_3,21,            f.close()  # Manual file closing,False,other
+problematic_3,22,"            print(f""Read file: {fname}"")  # Logging file access",True,debug_code
+problematic_3,23,            return content,False,other
+problematic_3,24,        except Exception:  # Too broad exception,True,poor_exception_handling
+problematic_3,25,"            print(""File read error"")  # Poor error handling",True,debug_code
+problematic_3,26,"            return """"  # Silent failure with wrong return type",False,other
+problematic_3,28,"    def writeFile(self, fname, data):",False,other
+problematic_3,29,        # TODO: Add file size limits,True,incomplete_code
+problematic_3,30,        try:,False,other
+problematic_3,31,"            path = self.directory + ""/"" + fname  # Inconsistent path handling",False,other
+problematic_3,32,            # HACK: Always overwrite files,True,incomplete_code
+problematic_3,33,"            file = open(path, ""w"")  # No context manager",False,other
+problematic_3,34,            file.write(str(data))  # Force string conversion,False,other
+problematic_3,35,            file.close(),False,other
+problematic_3,36,            self.files.append(fname)  # Duplicate tracking possible,False,other
+problematic_3,37,        except:  # Bare except,True,poor_exception_handling
+problematic_3,38,            pass  # Silent failure,False,other
+problematic_3,40,"    def deleteFile(self, fname):  # Destructive without confirmation",False,other
+problematic_3,41,        # FIXME: No safety checks,True,incomplete_code
+problematic_3,42,        full_path = self.directory + fname,False,other
+problematic_3,43,        try:,False,other
+problematic_3,44,            remove(full_path)  # Using imported function directly,False,other
+problematic_3,45,"            print(f""Deleted: {fname}"")  # Logging",True,debug_code
+problematic_3,46,            return True,False,other
+problematic_3,47,        except Exception:,True,poor_exception_handling
+problematic_3,48,            return False,False,other
+problematic_3,50,"    def executeFile(self, fname):  # MAJOR SECURITY RISK",False,other
+problematic_3,51,        # XXX: Arbitrary code execution,True,incomplete_code
+problematic_3,52,        try:,False,other
+problematic_3,53,            content = self.readFile(fname),False,other
+problematic_3,54,            exec(content)  # Execute arbitrary code from file!,True,security_risk
+problematic_3,55,            return True,False,other
+problematic_3,56,        except:,True,poor_exception_handling
+problematic_3,57,            return False,False,other
+problematic_3,59,    def backupFiles(self):  # Poor implementation,False,other
+problematic_3,60,        # TODO: Implement proper backup,True,incomplete_code
+problematic_3,61,        for file in listdir(self.directory):  # No error handling,False,other
+problematic_3,62,            try:,False,other
+problematic_3,63,"                shutil.copy(file, file + "".bak"")  # Poor backup strategy",False,other
+problematic_3,64,            except:,True,poor_exception_handling
+problematic_3,65,                continue  # Silent failures,False,other
+problematic_3,67,    def cleanTemp(self):,False,other
+problematic_3,68,        # HACK: Dangerous cleanup,True,incomplete_code
+problematic_3,69,        for f in self.temp:,False,other
+problematic_3,70,            try:,False,other
+problematic_3,71,                remove(f)  # No existence check,False,other
+problematic_3,72,            except:,True,poor_exception_handling
+problematic_3,73,                pass  # Silent failure,False,other
+problematic_3,74,        self.temp = []  # Modifying global state,True,poor_practice
+problematic_3,76,    def __del__(self):  # Problematic destructor,False,other
+problematic_3,77,"        print(""FileHandler destroyed"")  # Side effect in destructor",True,debug_code
+problematic_3,78,        self.cleanTemp()  # Potentially dangerous cleanup,False,other
+problematic_3,80,# Insecure global function,True,poor_practice
+problematic_3,81,"def quick_save(data, filename):",False,other
+problematic_3,82,    # FIXME: No validation,True,incomplete_code
+problematic_3,83,"    pickle.dump(data, open(filename, ""wb""))  # Pickle without context manager",False,other
+problematic_3,85,# Unused imports and variables,False,other
+problematic_3,86,import random  # Unused import,False,other
+problematic_3,87,"UNUSED_VAR = ""test""  # Unused variable",False,other
+clean_4,1,class UserManager:,False,none
+clean_4,2,"    """"""Secure user management system.""""""",False,none
+clean_4,4,    def __init__(self):,False,none
+clean_4,5,        self._users = {},False,none
+clean_4,6,        self._active_sessions = set(),False,none
+clean_4,8,"    def create_user(self, username: str, email: str, password: str) -> bool:",False,none
+clean_4,9,"        """"""Create a new user with validation.""""""",False,none
+clean_4,10,        if not self._validate_username(username):,False,none
+clean_4,11,"            raise ValueError(""Invalid username format"")",False,none
+clean_4,13,        if not self._validate_email(email):,False,none
+clean_4,14,"            raise ValueError(""Invalid email format"")",False,none
+clean_4,16,        if username in self._users:,False,none
+clean_4,17,"            raise ValueError(""Username already exists"")",False,none
+clean_4,19,        self._users[username] = {,False,none
+clean_4,20,"            ""email"": email,",False,none
+clean_4,21,"            ""password_hash"": self._hash_password(password),",False,none
+clean_4,22,"            ""created_at"": ""2024-01-01"",  # Simplified for example",False,none
+clean_4,23,"            ""active"": True",False,none
+clean_4,24,        },False,none
+clean_4,25,        return True,False,none
+clean_4,27,"    def authenticate(self, username: str, password: str) -> bool:",False,none
+clean_4,28,"        """"""Authenticate user credentials.""""""",False,none
+clean_4,29,        if username not in self._users:,False,none
+clean_4,30,            return False,False,none
+clean_4,32,        user = self._users[username],False,none
+clean_4,33,"        if not user[""active""]:",False,none
+clean_4,34,            return False,False,none
+clean_4,36,"        return user[""password_hash""] == self._hash_password(password)",False,none
+clean_4,38,"    def _validate_username(self, username: str) -> bool:",False,none
+clean_4,39,"        """"""Validate username format.""""""",False,none
+clean_4,40,        return (,False,none
+clean_4,41,"            isinstance(username, str) and",False,none
+clean_4,42,            3 <= len(username) <= 20 and,False,none
+clean_4,43,            username.isalnum(),False,none
+clean_4,44,        ),False,none
+clean_4,46,"    def _validate_email(self, email: str) -> bool:",False,none
+clean_4,47,"        """"""Basic email validation.""""""",False,none
+clean_4,48,        return (,False,none
+clean_4,49,"            isinstance(email, str) and",False,none
+clean_4,50,"            ""@"" in email and",False,none
+clean_4,51,"            ""."" in email.split(""@"")[-1]",False,none
+clean_4,52,        ),False,none
+clean_4,54,"    def _hash_password(self, password: str) -> str:",False,none
+clean_4,55,"        """"""Simple password hashing (use proper hashing in production).""""""",False,none
+clean_4,56,"        return f""hashed_{hash(password)}""",False,none
+problematic_4,1,# FIXME: Security vulnerabilities in user management,True,incomplete_code
+problematic_4,2,"import pickle, os  # Security risk with pickle",False,other
+problematic_4,3,from hashlib import *  # Wildcard import,True,security_risk
+problematic_4,5,users = {}  # Global mutable state,False,other
+problematic_4,6,current_user = None  # Global state,False,other
+problematic_4,8,class usermanager:  # Poor naming convention,False,other
+problematic_4,9,    def __init__(self):,False,other
+problematic_4,10,        # TODO: Load users from secure storage,True,incomplete_code
+problematic_4,11,        self.users = users  # Reference to global,False,other
+problematic_4,12,"        self.admin = ""admin""  # Hardcoded admin",False,other
+problematic_4,13,"        print(""UserManager started"")  # Debug print",True,debug_code
+problematic_4,15,"    def createUser(self, name, pwd, email=""""):  # camelCase, poor param names",False,other
+problematic_4,16,        # XXX: No password strength validation,True,incomplete_code
+problematic_4,17,"        if name == """":  # Poor string check",False,other
+problematic_4,18,            return False,False,other
+problematic_4,20,        if name in self.users:,False,other
+problematic_4,21,"            print(""User exists"")  # Poor error handling",True,debug_code
+problematic_4,22,            return False,False,other
+problematic_4,24,        # HACK: Simple password storage (MAJOR SECURITY ISSUE),True,incomplete_code
+problematic_4,25,        user_data = {,False,other
+problematic_4,26,"            ""password"": pwd,  # Storing plaintext password!",False,other
+problematic_4,27,"            ""email"": email,",False,other
+problematic_4,28,"            ""role"": ""user"",",False,other
+problematic_4,29,"            ""active"": True",False,other
+problematic_4,30,        },False,other
+problematic_4,32,        self.users[name] = user_data,False,other
+problematic_4,33,"        print(f""Created user: {name}"")  # Logging sensitive info",True,debug_code
+problematic_4,34,        return True,False,other
+problematic_4,36,"    def login(self, name, pwd):",False,other
+problematic_4,37,        # TODO: Implement session management,True,incomplete_code
+problematic_4,38,        try:,False,other
+problematic_4,39,            if name in self.users:,False,other
+problematic_4,40,"                if self.users[name][""password""] == pwd:  # Plaintext comparison",False,other
+problematic_4,41,                    global current_user  # Global variable modification,True,poor_practice
+problematic_4,42,                    current_user = name,False,other
+problematic_4,43,"                    print(f""User {name} logged in"")  # Logging",True,debug_code
+problematic_4,44,                    return True,False,other
+problematic_4,45,                else:,False,other
+problematic_4,46,                    return False,False,other
+problematic_4,47,            else:,False,other
+problematic_4,48,                return False,False,other
+problematic_4,49,        except Exception:  # Too broad exception,True,poor_exception_handling
+problematic_4,50,"            print(""Login error"")",True,debug_code
+problematic_4,51,            return False,False,other
+problematic_4,53,"    def deleteUser(self, name):  # Destructive operation",False,other
+problematic_4,54,        # FIXME: No confirmation or authorization check,True,incomplete_code
+problematic_4,55,        if name in self.users:,False,other
+problematic_4,56,            del self.users[name],False,other
+problematic_4,57,"            print(f""Deleted user: {name}"")  # Logging sensitive operation",True,debug_code
+problematic_4,58,            return True,False,other
+problematic_4,59,        return False,False,other
+problematic_4,61,"    def saveUsers(self, filename=""users.pkl""):  # Security risk with pickle",False,other
+problematic_4,62,        try:,False,other
+problematic_4,63,"            f = open(filename, ""wb"")  # No context manager",False,other
+problematic_4,64,"            pickle.dump(self.users, f)  # Pickle security risk",False,other
+problematic_4,65,            f.close(),False,other
+problematic_4,66,        except:  # Bare except,True,poor_exception_handling
+problematic_4,67,            pass  # Silent failure,False,other
+problematic_4,69,"    def loadUsers(self, filename=""users.pkl""):",False,other
+problematic_4,70,        # HACK: Loading pickled data (security risk),True,incomplete_code
+problematic_4,71,        try:,False,other
+problematic_4,72,            if os.path.exists(filename):,False,other
+problematic_4,73,"                f = open(filename, ""rb"")",False,other
+problematic_4,74,                self.users = pickle.load(f)  # Pickle deserialization risk,False,other
+problematic_4,75,                f.close(),False,other
+problematic_4,76,        except:,True,poor_exception_handling
+problematic_4,77,"            print(""Could not load users"")",True,debug_code
+problematic_4,78,            self.users = {},False,other
+problematic_4,80,"    def __getitem__(self, key):  # Unnecessary magic method",False,other
+problematic_4,81,"        return self.users.get(key, None)",False,other
+problematic_4,83,# Insecure global function,True,poor_practice
+problematic_4,84,"def admin_access(username, action):",False,other
+problematic_4,85,    # XXX: No proper authorization,True,incomplete_code
+problematic_4,86,"    if username == ""admin"":",False,other
+problematic_4,87,        exec(action)  # MAJOR SECURITY RISK: arbitrary code execution,True,security_risk
+problematic_4,88,        return True,False,other
+problematic_4,89,    return False,False,other
+clean_5,1,class TaskManager:,False,none
+clean_5,2,"    """"""Efficient task management with priority handling.""""""",False,none
+clean_5,4,    def __init__(self):,False,none
+clean_5,5,        self._tasks = {},False,none
+clean_5,6,        self._next_id = 1,False,none
+clean_5,8,"    def add_task(self, title: str, description: str = """", priority: str = ""medium"") -> int:",False,none
+clean_5,9,"        """"""Add a new task with validation.""""""",False,none
+clean_5,10,        if not title.strip():,False,none
+clean_5,11,"            raise ValueError(""Task title cannot be empty"")",False,none
+clean_5,13,"        valid_priorities = {""low"", ""medium"", ""high"", ""urgent""}",False,none
+clean_5,14,        if priority not in valid_priorities:,False,none
+clean_5,15,"            raise ValueError(f""Priority must be one of: {valid_priorities}"")",False,none
+clean_5,17,        task_id = self._next_id,False,none
+clean_5,18,        self._tasks[task_id] = {,False,none
+clean_5,19,"            ""title"": title.strip(),",False,none
+clean_5,20,"            ""description"": description.strip(),",False,none
+clean_5,21,"            ""priority"": priority,",False,none
+clean_5,22,"            ""completed"": False",False,none
+clean_5,23,        },False,none
+clean_5,24,        self._next_id += 1,False,none
+clean_5,25,        return task_id,False,none
+clean_5,27,"    def complete_task(self, task_id: int) -> bool:",False,none
+clean_5,28,"        """"""Mark a task as completed.""""""",False,none
+clean_5,29,        if task_id not in self._tasks:,False,none
+clean_5,30,"            raise KeyError(f""Task {task_id} not found"")",False,none
+clean_5,32,"        self._tasks[task_id][""completed""] = True",False,none
+clean_5,33,        return True,False,none
+clean_5,35,"    def get_pending_tasks(self) -> Dict[int, Dict]:",False,none
+clean_5,36,"        """"""Get all incomplete tasks.""""""",False,none
+clean_5,37,        return {,False,none
+clean_5,38,"            tid: task for tid, task in self._tasks.items() ",False,none
+clean_5,39,"            if not task[""completed""]",False,none
+clean_5,40,        },False,none
+clean_5,42,"    def get_tasks_by_priority(self, priority: str) -> Dict[int, Dict]:",False,none
+clean_5,43,"        """"""Get tasks filtered by priority level.""""""",False,none
+clean_5,44,        return {,False,none
+clean_5,45,"            tid: task for tid, task in self._tasks.items() ",False,none
+clean_5,46,"            if task[""priority""] == priority",False,none
+clean_5,47,        },False,none
+problematic_5,1,# FIXME: Rewrite this entire task manager,True,incomplete_code
+problematic_5,2,from os import *  # Wildcard import,True,security_risk
+problematic_5,3,"import sys, json, pickle  # Multiple imports",False,other
+problematic_5,5,DEBUG = True  # Global constant,False,other
+problematic_5,6,tasks = []  # Global mutable state,False,other
+problematic_5,8,class TaskManager:  # Missing docstring,False,other
+problematic_5,9,    def __init__(self):,False,other
+problematic_5,10,        self.tasks = {},False,other
+problematic_5,11,        self.id = 1  # Poor naming (shadows built-in),False,other
+problematic_5,12,        self.count = 0,False,other
+problematic_5,13,"        print(""TaskManager initialized"")  # Debug print",True,debug_code
+problematic_5,15,"    def addTask(self, title, desc="""", pri=""med""):  # camelCase, poor names",False,other
+problematic_5,16,        # TODO: Add proper validation,True,incomplete_code
+problematic_5,17,"        if title == """":  # String comparison with ==",False,other
+problematic_5,18,            return None,False,other
+problematic_5,19,"        if pri not in [""low"", ""med"", ""high""]:",False,other
+problematic_5,20,"            pri = ""med""  # Silent failure instead of raising exception",False,other
+problematic_5,22,        task = {}  # Could use dataclass or namedtuple,False,other
+problematic_5,23,"        task[""title""] = title",False,other
+problematic_5,24,"        task[""desc""] = desc",False,other
+problematic_5,25,"        task[""priority""] = pri",False,other
+problematic_5,26,"        task[""done""] = False",False,other
+problematic_5,27,"        task[""id""] = self.id",False,other
+problematic_5,29,        self.tasks[self.id] = task,False,other
+problematic_5,30,        self.id = self.id + 1  # Verbose increment,False,other
+problematic_5,31,        self.count += 1,False,other
+problematic_5,33,        # XXX: This logging is problematic,True,incomplete_code
+problematic_5,34,"        print(f""Added task: {title}"")",True,debug_code
+problematic_5,35,        return self.id - 1,False,other
+problematic_5,37,"    def completeTask(self, id):  # Shadows built-in 'id'",False,other
+problematic_5,38,        # HACK: Quick implementation,True,incomplete_code
+problematic_5,39,        try:,False,other
+problematic_5,40,            if id in self.tasks:,False,other
+problematic_5,41,"                self.tasks[id][""done""] = True",False,other
+problematic_5,42,                self.count = self.count - 1,False,other
+problematic_5,43,                return True,False,other
+problematic_5,44,            else:,False,other
+problematic_5,45,                return False,False,other
+problematic_5,46,        except Exception:  # Too broad exception handling,True,poor_exception_handling
+problematic_5,47,"            print(""Error completing task"")",True,debug_code
+problematic_5,48,            return False,False,other
+problematic_5,50,    def getTasks(self):  # camelCase,False,other
+problematic_5,51,        # TODO: Filter by status,True,incomplete_code
+problematic_5,52,        return self.tasks,False,other
+problematic_5,54,    def deleteTasks(self):  # Destructive operation without confirmation,False,other
+problematic_5,55,        self.tasks = {},False,other
+problematic_5,56,        self.count = 0,False,other
+problematic_5,57,"        print(""All tasks deleted"")  # Side effect",True,debug_code
+problematic_5,59,    def __str__(self):,False,other
+problematic_5,60,"        return f""TaskManager with {len(self.tasks)} tasks""  # Inconsistent with self.count",False,other
+problematic_5,62,# Global helper function,False,other
+problematic_5,63,def save_tasks(manager):,False,other
+problematic_5,64,    # FIXME: Hardcoded filename,True,incomplete_code
+problematic_5,65,    try:,False,other
+problematic_5,66,"        with open(""tasks.json"", ""w"") as f:",False,other
+problematic_5,67,"            json.dump(manager.tasks, f)",False,other
+problematic_5,68,    except:  # Bare except,True,poor_exception_handling
+problematic_5,69,        pass  # Silent failure,False,other
+clean_6,1,class UserManager:,False,none
+clean_6,2,"    """"""Secure user management system.""""""",False,none
+clean_6,4,    def __init__(self):,False,none
+clean_6,5,        self._users = {},False,none
+clean_6,6,        self._active_sessions = set(),False,none
+clean_6,8,"    def create_user(self, username: str, email: str, password: str) -> bool:",False,none
+clean_6,9,"        """"""Create a new user with validation.""""""",False,none
+clean_6,10,        if not self._validate_username(username):,False,none
+clean_6,11,"            raise ValueError(""Invalid username format"")",False,none
+clean_6,13,        if not self._validate_email(email):,False,none
+clean_6,14,"            raise ValueError(""Invalid email format"")",False,none
+clean_6,16,        if username in self._users:,False,none
+clean_6,17,"            raise ValueError(""Username already exists"")",False,none
+clean_6,19,        self._users[username] = {,False,none
+clean_6,20,"            ""email"": email,",False,none
+clean_6,21,"            ""password_hash"": self._hash_password(password),",False,none
+clean_6,22,"            ""created_at"": ""2024-01-01"",  # Simplified for example",False,none
+clean_6,23,"            ""active"": True",False,none
+clean_6,24,        },False,none
+clean_6,25,        return True,False,none
+clean_6,27,"    def authenticate(self, username: str, password: str) -> bool:",False,none
+clean_6,28,"        """"""Authenticate user credentials.""""""",False,none
+clean_6,29,        if username not in self._users:,False,none
+clean_6,30,            return False,False,none
+clean_6,32,        user = self._users[username],False,none
+clean_6,33,"        if not user[""active""]:",False,none
+clean_6,34,            return False,False,none
+clean_6,36,"        return user[""password_hash""] == self._hash_password(password)",False,none
+clean_6,38,"    def _validate_username(self, username: str) -> bool:",False,none
+clean_6,39,"        """"""Validate username format.""""""",False,none
+clean_6,40,        return (,False,none
+clean_6,41,"            isinstance(username, str) and",False,none
+clean_6,42,            3 <= len(username) <= 20 and,False,none
+clean_6,43,            username.isalnum(),False,none
+clean_6,44,        ),False,none
+clean_6,46,"    def _validate_email(self, email: str) -> bool:",False,none
+clean_6,47,"        """"""Basic email validation.""""""",False,none
+clean_6,48,        return (,False,none
+clean_6,49,"            isinstance(email, str) and",False,none
+clean_6,50,"            ""@"" in email and",False,none
+clean_6,51,"            ""."" in email.split(""@"")[-1]",False,none
+clean_6,52,        ),False,none
+clean_6,54,"    def _hash_password(self, password: str) -> str:",False,none
+clean_6,55,"        """"""Simple password hashing (use proper hashing in production).""""""",False,none
+clean_6,56,"        return f""hashed_{hash(password)}""",False,none
+problematic_6,1,# FIXME: Security vulnerabilities in user management,True,incomplete_code
+problematic_6,2,"import pickle, os  # Security risk with pickle",False,other
+problematic_6,3,from hashlib import *  # Wildcard import,True,security_risk
+problematic_6,5,users = {}  # Global mutable state,False,other
+problematic_6,6,current_user = None  # Global state,False,other
+problematic_6,8,class usermanager:  # Poor naming convention,False,other
+problematic_6,9,    def __init__(self):,False,other
+problematic_6,10,        # TODO: Load users from secure storage,True,incomplete_code
+problematic_6,11,        self.users = users  # Reference to global,False,other
+problematic_6,12,"        self.admin = ""admin""  # Hardcoded admin",False,other
+problematic_6,13,"        print(""UserManager started"")  # Debug print",True,debug_code
+problematic_6,15,"    def createUser(self, name, pwd, email=""""):  # camelCase, poor param names",False,other
+problematic_6,16,        # XXX: No password strength validation,True,incomplete_code
+problematic_6,17,"        if name == """":  # Poor string check",False,other
+problematic_6,18,            return False,False,other
+problematic_6,20,        if name in self.users:,False,other
+problematic_6,21,"            print(""User exists"")  # Poor error handling",True,debug_code
+problematic_6,22,            return False,False,other
+problematic_6,24,        # HACK: Simple password storage (MAJOR SECURITY ISSUE),True,incomplete_code
+problematic_6,25,        user_data = {,False,other
+problematic_6,26,"            ""password"": pwd,  # Storing plaintext password!",False,other
+problematic_6,27,"            ""email"": email,",False,other
+problematic_6,28,"            ""role"": ""user"",",False,other
+problematic_6,29,"            ""active"": True",False,other
+problematic_6,30,        },False,other
+problematic_6,32,        self.users[name] = user_data,False,other
+problematic_6,33,"        print(f""Created user: {name}"")  # Logging sensitive info",True,debug_code
+problematic_6,34,        return True,False,other
+problematic_6,36,"    def login(self, name, pwd):",False,other
+problematic_6,37,        # TODO: Implement session management,True,incomplete_code
+problematic_6,38,        try:,False,other
+problematic_6,39,            if name in self.users:,False,other
+problematic_6,40,"                if self.users[name][""password""] == pwd:  # Plaintext comparison",False,other
+problematic_6,41,                    global current_user  # Global variable modification,True,poor_practice
+problematic_6,42,                    current_user = name,False,other
+problematic_6,43,"                    print(f""User {name} logged in"")  # Logging",True,debug_code
+problematic_6,44,                    return True,False,other
+problematic_6,45,                else:,False,other
+problematic_6,46,                    return False,False,other
+problematic_6,47,            else:,False,other
+problematic_6,48,                return False,False,other
+problematic_6,49,        except Exception:  # Too broad exception,True,poor_exception_handling
+problematic_6,50,"            print(""Login error"")",True,debug_code
+problematic_6,51,            return False,False,other
+problematic_6,53,"    def deleteUser(self, name):  # Destructive operation",False,other
+problematic_6,54,        # FIXME: No confirmation or authorization check,True,incomplete_code
+problematic_6,55,        if name in self.users:,False,other
+problematic_6,56,            del self.users[name],False,other
+problematic_6,57,"            print(f""Deleted user: {name}"")  # Logging sensitive operation",True,debug_code
+problematic_6,58,            return True,False,other
+problematic_6,59,        return False,False,other
+problematic_6,61,"    def saveUsers(self, filename=""users.pkl""):  # Security risk with pickle",False,other
+problematic_6,62,        try:,False,other
+problematic_6,63,"            f = open(filename, ""wb"")  # No context manager",False,other
+problematic_6,64,"            pickle.dump(self.users, f)  # Pickle security risk",False,other
+problematic_6,65,            f.close(),False,other
+problematic_6,66,        except:  # Bare except,True,poor_exception_handling
+problematic_6,67,            pass  # Silent failure,False,other
+problematic_6,69,"    def loadUsers(self, filename=""users.pkl""):",False,other
+problematic_6,70,        # HACK: Loading pickled data (security risk),True,incomplete_code
+problematic_6,71,        try:,False,other
+problematic_6,72,            if os.path.exists(filename):,False,other
+problematic_6,73,"                f = open(filename, ""rb"")",False,other
+problematic_6,74,                self.users = pickle.load(f)  # Pickle deserialization risk,False,other
+problematic_6,75,                f.close(),False,other
+problematic_6,76,        except:,True,poor_exception_handling
+problematic_6,77,"            print(""Could not load users"")",True,debug_code
+problematic_6,78,            self.users = {},False,other
+problematic_6,80,"    def __getitem__(self, key):  # Unnecessary magic method",False,other
+problematic_6,81,"        return self.users.get(key, None)",False,other
+problematic_6,83,# Insecure global function,True,poor_practice
+problematic_6,84,"def admin_access(username, action):",False,other
+problematic_6,85,    # XXX: No proper authorization,True,incomplete_code
+problematic_6,86,"    if username == ""admin"":",False,other
+problematic_6,87,        exec(action)  # MAJOR SECURITY RISK: arbitrary code execution,True,security_risk
+problematic_6,88,        return True,False,other
+problematic_6,89,    return False,False,other
+clean_7,1,class FileHandler:,False,none
+clean_7,2,"    """"""Safe file operations with proper error handling.""""""",False,none
+clean_7,4,"    def __init__(self, base_directory: str = ""./""):",False,none
+clean_7,5,        self._base_dir = base_directory,False,none
+clean_7,6,"        self._allowed_extensions = {"".txt"", "".json"", "".csv"", "".log""}",False,none
+clean_7,8,"    def read_file(self, filename: str) -> str:",False,none
+clean_7,9,"        """"""Safely read file contents.""""""",False,none
+clean_7,10,        if not self._is_safe_filename(filename):,False,none
+clean_7,11,"            raise ValueError(""Invalid filename"")",False,none
+clean_7,13,        try:,False,none
+clean_7,14,            full_path = self._get_safe_path(filename),False,none
+clean_7,15,"            with open(full_path, 'r', encoding='utf-8') as f:",False,none
+clean_7,16,                return f.read(),False,none
+clean_7,17,        except FileNotFoundError:,False,none
+clean_7,18,"            raise FileNotFoundError(f""File {filename} not found"")",False,none
+clean_7,19,        except PermissionError:,False,none
+clean_7,20,"            raise PermissionError(f""No permission to read {filename}"")",False,none
+clean_7,22,"    def write_file(self, filename: str, content: str) -> bool:",False,none
+clean_7,23,"        """"""Safely write content to file.""""""",False,none
+clean_7,24,        if not self._is_safe_filename(filename):,False,none
+clean_7,25,"            raise ValueError(""Invalid filename"")",False,none
+clean_7,27,        try:,False,none
+clean_7,28,            full_path = self._get_safe_path(filename),False,none
+clean_7,29,"            with open(full_path, 'w', encoding='utf-8') as f:",False,none
+clean_7,30,                f.write(content),False,none
+clean_7,31,            return True,False,none
+clean_7,32,        except PermissionError:,False,none
+clean_7,33,"            raise PermissionError(f""No permission to write {filename}"")",False,none
+clean_7,35,"    def _is_safe_filename(self, filename: str) -> bool:",False,none
+clean_7,36,"        """"""Validate filename for security.""""""",False,none
+clean_7,37,"        if not filename or "".."" in filename or ""/"" in filename:",False,none
+clean_7,38,            return False,False,none
+clean_7,40,"        extension = ""."" + filename.split(""."")[-1] if ""."" in filename else """"",False,none
+clean_7,41,        return extension.lower() in self._allowed_extensions,False,none
+clean_7,43,"    def _get_safe_path(self, filename: str) -> str:",False,none
+clean_7,44,"        """"""Get safe file path within base directory.""""""",False,none
+clean_7,45,"        return f""{self._base_dir.rstrip('/')}/{filename}""",False,none
+clean_7,47,    def list_files(self) -> List[str]:,False,none
+clean_7,48,"        """"""List all files in the base directory.""""""",False,none
+clean_7,49,        import os,False,none
+clean_7,50,        try:,False,none
+clean_7,51,            files = os.listdir(self._base_dir),False,none
+clean_7,52,            return [f for f in files if self._is_safe_filename(f)],False,none
+clean_7,53,        except OSError:,False,none
+clean_7,54,            return [],False,none
+problematic_7,1,# TODO: Fix all the security issues in this file handler,True,incomplete_code
+problematic_7,2,from os import *  # Wildcard import - security risk,True,security_risk
+problematic_7,3,"import shutil, pickle  # Multiple imports",False,other
+problematic_7,5,temp_files = []  # Global mutable state,False,other
+problematic_7,7,class filehandler:  # Poor naming convention,False,other
+problematic_7,8,"    def __init__(self, dir=""./""):  # Mutable default argument",False,other
+problematic_7,9,        # FIXME: No directory validation,True,incomplete_code
+problematic_7,10,        self.directory = dir,False,other
+problematic_7,11,        self.files = [],False,other
+problematic_7,12,        self.temp = temp_files  # Reference to global,False,other
+problematic_7,13,"        print(f""FileHandler for {dir}"")  # Debug print",True,debug_code
+problematic_7,15,"    def readFile(self, fname):  # camelCase, poor parameter name",False,other
+problematic_7,16,        # XXX: No path traversal protection,True,incomplete_code
+problematic_7,17,        try:,False,other
+problematic_7,18,            path = self.directory + fname  # Insecure path concatenation,False,other
+problematic_7,19,"            f = open(path, ""r"")  # No context manager",False,other
+problematic_7,20,            content = f.read(),False,other
+problematic_7,21,            f.close()  # Manual file closing,False,other
+problematic_7,22,"            print(f""Read file: {fname}"")  # Logging file access",True,debug_code
+problematic_7,23,            return content,False,other
+problematic_7,24,        except Exception:  # Too broad exception,True,poor_exception_handling
+problematic_7,25,"            print(""File read error"")  # Poor error handling",True,debug_code
+problematic_7,26,"            return """"  # Silent failure with wrong return type",False,other
+problematic_7,28,"    def writeFile(self, fname, data):",False,other
+problematic_7,29,        # TODO: Add file size limits,True,incomplete_code
+problematic_7,30,        try:,False,other
+problematic_7,31,"            path = self.directory + ""/"" + fname  # Inconsistent path handling",False,other
+problematic_7,32,            # HACK: Always overwrite files,True,incomplete_code
+problematic_7,33,"            file = open(path, ""w"")  # No context manager",False,other
+problematic_7,34,            file.write(str(data))  # Force string conversion,False,other
+problematic_7,35,            file.close(),False,other
+problematic_7,36,            self.files.append(fname)  # Duplicate tracking possible,False,other
+problematic_7,37,        except:  # Bare except,True,poor_exception_handling
+problematic_7,38,            pass  # Silent failure,False,other
+problematic_7,40,"    def deleteFile(self, fname):  # Destructive without confirmation",False,other
+problematic_7,41,        # FIXME: No safety checks,True,incomplete_code
+problematic_7,42,        full_path = self.directory + fname,False,other
+problematic_7,43,        try:,False,other
+problematic_7,44,            remove(full_path)  # Using imported function directly,False,other
+problematic_7,45,"            print(f""Deleted: {fname}"")  # Logging",True,debug_code
+problematic_7,46,            return True,False,other
+problematic_7,47,        except Exception:,True,poor_exception_handling
+problematic_7,48,            return False,False,other
+problematic_7,50,"    def executeFile(self, fname):  # MAJOR SECURITY RISK",False,other
+problematic_7,51,        # XXX: Arbitrary code execution,True,incomplete_code
+problematic_7,52,        try:,False,other
+problematic_7,53,            content = self.readFile(fname),False,other
+problematic_7,54,            exec(content)  # Execute arbitrary code from file!,True,security_risk
+problematic_7,55,            return True,False,other
+problematic_7,56,        except:,True,poor_exception_handling
+problematic_7,57,            return False,False,other
+problematic_7,59,    def backupFiles(self):  # Poor implementation,False,other
+problematic_7,60,        # TODO: Implement proper backup,True,incomplete_code
+problematic_7,61,        for file in listdir(self.directory):  # No error handling,False,other
+problematic_7,62,            try:,False,other
+problematic_7,63,"                shutil.copy(file, file + "".bak"")  # Poor backup strategy",False,other
+problematic_7,64,            except:,True,poor_exception_handling
+problematic_7,65,                continue  # Silent failures,False,other
+problematic_7,67,    def cleanTemp(self):,False,other
+problematic_7,68,        # HACK: Dangerous cleanup,True,incomplete_code
+problematic_7,69,        for f in self.temp:,False,other
+problematic_7,70,            try:,False,other
+problematic_7,71,                remove(f)  # No existence check,False,other
+problematic_7,72,            except:,True,poor_exception_handling
+problematic_7,73,                pass  # Silent failure,False,other
+problematic_7,74,        self.temp = []  # Modifying global state,True,poor_practice
+problematic_7,76,    def __del__(self):  # Problematic destructor,False,other
+problematic_7,77,"        print(""FileHandler destroyed"")  # Side effect in destructor",True,debug_code
+problematic_7,78,        self.cleanTemp()  # Potentially dangerous cleanup,False,other
+problematic_7,80,# Insecure global function,True,poor_practice
+problematic_7,81,"def quick_save(data, filename):",False,other
+problematic_7,82,    # FIXME: No validation,True,incomplete_code
+problematic_7,83,"    pickle.dump(data, open(filename, ""wb""))  # Pickle without context manager",False,other
+problematic_7,85,# Unused imports and variables,False,other
+problematic_7,86,import random  # Unused import,False,other
+problematic_7,87,"UNUSED_VAR = ""test""  # Unused variable",False,other
+clean_8,1,class DataProcessor:,False,none
+clean_8,2,"    """"""Robust data processing with error handling.""""""",False,none
+clean_8,4,    def __init__(self):,False,none
+clean_8,5,        self._processed_count = 0,False,none
+clean_8,6,        self._error_count = 0,False,none
+clean_8,8,"    def process_numbers(self, numbers: List[float]) -> Dict[str, float]:",False,none
+clean_8,9,"        """"""Process a list of numbers and return statistics.""""""",False,none
+clean_8,10,        if not numbers:,False,none
+clean_8,11,"            raise ValueError(""Cannot process empty list"")",False,none
+clean_8,13,        try:,False,none
+clean_8,14,            result = {,False,none
+clean_8,15,"                ""mean"": sum(numbers) / len(numbers),",False,none
+clean_8,16,"                ""min"": min(numbers),",False,none
+clean_8,17,"                ""max"": max(numbers),",False,none
+clean_8,18,"                ""count"": len(numbers)",False,none
+clean_8,19,            },False,none
+clean_8,20,            self._processed_count += 1,False,none
+clean_8,21,            return result,False,none
+clean_8,23,"        except (TypeError, ZeroDivisionError) as e:",False,none
+clean_8,24,            self._error_count += 1,False,none
+clean_8,25,"            raise ValueError(f""Processing error: {e}"")",False,none
+clean_8,27,"    def validate_data(self, data: List) -> bool:",False,none
+clean_8,28,"        """"""Validate input data before processing.""""""",False,none
+clean_8,29,"        if not isinstance(data, list):",False,none
+clean_8,30,            return False,False,none
+clean_8,32,"        return all(isinstance(item, (int, float)) for item in data)",False,none
+clean_8,34,"    def get_statistics(self) -> Dict[str, int]:",False,none
+clean_8,35,"        """"""Get processing statistics.""""""",False,none
+clean_8,36,        return {,False,none
+clean_8,37,"            ""processed"": self._processed_count,",False,none
+clean_8,38,"            ""errors"": self._error_count",False,none
+clean_8,39,        },False,none
+clean_8,41,    def reset_stats(self) -> None:,False,none
+clean_8,42,"        """"""Reset processing statistics.""""""",False,none
+clean_8,43,        self._processed_count = 0,False,none
+clean_8,44,        self._error_count = 0,False,none
+problematic_8,1,# XXX: This data processor needs major refactoring,True,incomplete_code
+problematic_8,2,from math import *  # Wildcard import,True,security_risk
+problematic_8,3,"import os, sys, json  # Multiple imports per line",False,other
+problematic_8,5,# Global variables,False,other
+problematic_8,6,cache = {}  # Mutable global state,True,poor_practice
+problematic_8,7,DEBUG_MODE = True,False,other
+problematic_8,9,class dataProcessor:  # Poor class naming,False,other
+problematic_8,10,"    def __init__(self, data=None):",False,other
+problematic_8,11,        # TODO: Validate input data,True,incomplete_code
+problematic_8,12,        self.data = data if data != None else []  # Use 'is not None',False,other
+problematic_8,13,        self.results = {},False,other
+problematic_8,14,        self.errors = 0,False,other
+problematic_8,15,"        print(""DataProcessor created"")  # Debug output",True,debug_code
+problematic_8,17,"    def processData(self, data_list):  # camelCase method",False,other
+problematic_8,18,        # FIXME: This method is too long and does too much,True,incomplete_code
+problematic_8,19,        if len(data_list) == 0:  # Use 'not data_list',False,other
+problematic_8,20,            return None,False,other
+problematic_8,22,        results = [],False,other
+problematic_8,23,        for item in data_list:,False,other
+problematic_8,24,            # HACK: Converting everything to float,True,incomplete_code
+problematic_8,25,            try:,False,other
+problematic_8,26,"                if isinstance(item, str):",False,other
+problematic_8,27,"                    if item == """":  # Poor string check",False,other
+problematic_8,28,                        item = 0,False,other
+problematic_8,29,                    else:,False,other
+problematic_8,30,                        item = float(item),False,other
+problematic_8,31,"                elif isinstance(item, int):",False,other
+problematic_8,32,                    item = float(item),False,other
+problematic_8,33,                results.append(item),False,other
+problematic_8,34,            except Exception:  # Too broad exception,True,poor_exception_handling
+problematic_8,35,"                print(f""Error processing: {item}"")  # Debug print",True,debug_code
+problematic_8,36,                self.errors = self.errors + 1  # Verbose increment,False,other
+problematic_8,37,"                results.append(0.0)  # Silent failure, adds wrong data",False,other
+problematic_8,39,        # TODO: Implement proper statistics,True,incomplete_code
+problematic_8,40,        if len(results) > 0:,False,other
+problematic_8,41,            mean = sum(results) / len(results),False,other
+problematic_8,42,            max_val = max(results),False,other
+problematic_8,43,            min_val = min(results),False,other
+problematic_8,44,        else:,False,other
+problematic_8,45,            mean = 0,False,other
+problematic_8,46,            max_val = 0,False,other
+problematic_8,47,            min_val = 0,False,other
+problematic_8,49,"        self.results = {""mean"": mean, ""max"": max_val, ""min"": min_val}",False,other
+problematic_8,50,        return self.results,False,other
+problematic_8,52,    def getData(self):  # camelCase,False,other
+problematic_8,53,        return self.data,False,other
+problematic_8,55,    def clearData(self):  # Destructive without confirmation,False,other
+problematic_8,56,        self.data = [],False,other
+problematic_8,57,        self.results = {},False,other
+problematic_8,58,"        print(""Data cleared"")  # Side effect",True,debug_code
+problematic_8,60,"    def saveResults(self, filename=""results.json""):  # camelCase, mutable default",False,other
+problematic_8,61,        # XXX: No error handling for file operations,True,incomplete_code
+problematic_8,62,        try:,False,other
+problematic_8,63,"            f = open(filename, ""w"")  # Not using context manager",False,other
+problematic_8,64,"            json.dump(self.results, f)",False,other
+problematic_8,65,            f.close()  # Manual file closing,False,other
+problematic_8,66,        except:  # Bare except,True,poor_exception_handling
+problematic_8,67,            pass  # Silent failure,False,other
+problematic_8,69,"    def __add__(self, other):  # Questionable operator overloading",False,other
+problematic_8,70,        # HACK: Quick implementation,True,incomplete_code
+problematic_8,71,"        if hasattr(other, 'data'):",False,other
+problematic_8,72,            return dataProcessor(self.data + other.data),False,other
+problematic_8,73,        else:,False,other
+problematic_8,74,            return self,False,other
+problematic_8,76,# Global function instead of method,False,other
+problematic_8,77,def quick_process(data):,False,other
+problematic_8,78,    # TODO: Move this to class,True,incomplete_code
+problematic_8,79,    try:,False,other
+problematic_8,80,        return sum(data) / len(data),False,other
+problematic_8,81,"    except:  # Multiple issues: bare except, division by zero",True,poor_exception_handling
+problematic_8,82,        return 0,False,other
+problematic_8,84,# Unused variable,False,other
+problematic_8,85,TEMP_STORAGE = [],False,other
+clean_9,1,class UserManager:,False,none
+clean_9,2,"    """"""Secure user management system.""""""",False,none
+clean_9,4,    def __init__(self):,False,none
+clean_9,5,        self._users = {},False,none
+clean_9,6,        self._active_sessions = set(),False,none
+clean_9,8,"    def create_user(self, username: str, email: str, password: str) -> bool:",False,none
+clean_9,9,"        """"""Create a new user with validation.""""""",False,none
+clean_9,10,        if not self._validate_username(username):,False,none
+clean_9,11,"            raise ValueError(""Invalid username format"")",False,none
+clean_9,13,        if not self._validate_email(email):,False,none
+clean_9,14,"            raise ValueError(""Invalid email format"")",False,none
+clean_9,16,        if username in self._users:,False,none
+clean_9,17,"            raise ValueError(""Username already exists"")",False,none
+clean_9,19,        self._users[username] = {,False,none
+clean_9,20,"            ""email"": email,",False,none
+clean_9,21,"            ""password_hash"": self._hash_password(password),",False,none
+clean_9,22,"            ""created_at"": ""2024-01-01"",  # Simplified for example",False,none
+clean_9,23,"            ""active"": True",False,none
+clean_9,24,        },False,none
+clean_9,25,        return True,False,none
+clean_9,27,"    def authenticate(self, username: str, password: str) -> bool:",False,none
+clean_9,28,"        """"""Authenticate user credentials.""""""",False,none
+clean_9,29,        if username not in self._users:,False,none
+clean_9,30,            return False,False,none
+clean_9,32,        user = self._users[username],False,none
+clean_9,33,"        if not user[""active""]:",False,none
+clean_9,34,            return False,False,none
+clean_9,36,"        return user[""password_hash""] == self._hash_password(password)",False,none
+clean_9,38,"    def _validate_username(self, username: str) -> bool:",False,none
+clean_9,39,"        """"""Validate username format.""""""",False,none
+clean_9,40,        return (,False,none
+clean_9,41,"            isinstance(username, str) and",False,none
+clean_9,42,            3 <= len(username) <= 20 and,False,none
+clean_9,43,            username.isalnum(),False,none
+clean_9,44,        ),False,none
+clean_9,46,"    def _validate_email(self, email: str) -> bool:",False,none
+clean_9,47,"        """"""Basic email validation.""""""",False,none
+clean_9,48,        return (,False,none
+clean_9,49,"            isinstance(email, str) and",False,none
+clean_9,50,"            ""@"" in email and",False,none
+clean_9,51,"            ""."" in email.split(""@"")[-1]",False,none
+clean_9,52,        ),False,none
+clean_9,54,"    def _hash_password(self, password: str) -> str:",False,none
+clean_9,55,"        """"""Simple password hashing (use proper hashing in production).""""""",False,none
+clean_9,56,"        return f""hashed_{hash(password)}""",False,none
+problematic_9,1,# FIXME: Security vulnerabilities in user management,True,incomplete_code
+problematic_9,2,"import pickle, os  # Security risk with pickle",False,other
+problematic_9,3,from hashlib import *  # Wildcard import,True,security_risk
+problematic_9,5,users = {}  # Global mutable state,False,other
+problematic_9,6,current_user = None  # Global state,False,other
+problematic_9,8,class usermanager:  # Poor naming convention,False,other
+problematic_9,9,    def __init__(self):,False,other
+problematic_9,10,        # TODO: Load users from secure storage,True,incomplete_code
+problematic_9,11,        self.users = users  # Reference to global,False,other
+problematic_9,12,"        self.admin = ""admin""  # Hardcoded admin",False,other
+problematic_9,13,"        print(""UserManager started"")  # Debug print",True,debug_code
+problematic_9,15,"    def createUser(self, name, pwd, email=""""):  # camelCase, poor param names",False,other
+problematic_9,16,        # XXX: No password strength validation,True,incomplete_code
+problematic_9,17,"        if name == """":  # Poor string check",False,other
+problematic_9,18,            return False,False,other
+problematic_9,20,        if name in self.users:,False,other
+problematic_9,21,"            print(""User exists"")  # Poor error handling",True,debug_code
+problematic_9,22,            return False,False,other
+problematic_9,24,        # HACK: Simple password storage (MAJOR SECURITY ISSUE),True,incomplete_code
+problematic_9,25,        user_data = {,False,other
+problematic_9,26,"            ""password"": pwd,  # Storing plaintext password!",False,other
+problematic_9,27,"            ""email"": email,",False,other
+problematic_9,28,"            ""role"": ""user"",",False,other
+problematic_9,29,"            ""active"": True",False,other
+problematic_9,30,        },False,other
+problematic_9,32,        self.users[name] = user_data,False,other
+problematic_9,33,"        print(f""Created user: {name}"")  # Logging sensitive info",True,debug_code
+problematic_9,34,        return True,False,other
+problematic_9,36,"    def login(self, name, pwd):",False,other
+problematic_9,37,        # TODO: Implement session management,True,incomplete_code
+problematic_9,38,        try:,False,other
+problematic_9,39,            if name in self.users:,False,other
+problematic_9,40,"                if self.users[name][""password""] == pwd:  # Plaintext comparison",False,other
+problematic_9,41,                    global current_user  # Global variable modification,True,poor_practice
+problematic_9,42,                    current_user = name,False,other
+problematic_9,43,"                    print(f""User {name} logged in"")  # Logging",True,debug_code
+problematic_9,44,                    return True,False,other
+problematic_9,45,                else:,False,other
+problematic_9,46,                    return False,False,other
+problematic_9,47,            else:,False,other
+problematic_9,48,                return False,False,other
+problematic_9,49,        except Exception:  # Too broad exception,True,poor_exception_handling
+problematic_9,50,"            print(""Login error"")",True,debug_code
+problematic_9,51,            return False,False,other
+problematic_9,53,"    def deleteUser(self, name):  # Destructive operation",False,other
+problematic_9,54,        # FIXME: No confirmation or authorization check,True,incomplete_code
+problematic_9,55,        if name in self.users:,False,other
+problematic_9,56,            del self.users[name],False,other
+problematic_9,57,"            print(f""Deleted user: {name}"")  # Logging sensitive operation",True,debug_code
+problematic_9,58,            return True,False,other
+problematic_9,59,        return False,False,other
+problematic_9,61,"    def saveUsers(self, filename=""users.pkl""):  # Security risk with pickle",False,other
+problematic_9,62,        try:,False,other
+problematic_9,63,"            f = open(filename, ""wb"")  # No context manager",False,other
+problematic_9,64,"            pickle.dump(self.users, f)  # Pickle security risk",False,other
+problematic_9,65,            f.close(),False,other
+problematic_9,66,        except:  # Bare except,True,poor_exception_handling
+problematic_9,67,            pass  # Silent failure,False,other
+problematic_9,69,"    def loadUsers(self, filename=""users.pkl""):",False,other
+problematic_9,70,        # HACK: Loading pickled data (security risk),True,incomplete_code
+problematic_9,71,        try:,False,other
+problematic_9,72,            if os.path.exists(filename):,False,other
+problematic_9,73,"                f = open(filename, ""rb"")",False,other
+problematic_9,74,                self.users = pickle.load(f)  # Pickle deserialization risk,False,other
+problematic_9,75,                f.close(),False,other
+problematic_9,76,        except:,True,poor_exception_handling
+problematic_9,77,"            print(""Could not load users"")",True,debug_code
+problematic_9,78,            self.users = {},False,other
+problematic_9,80,"    def __getitem__(self, key):  # Unnecessary magic method",False,other
+problematic_9,81,"        return self.users.get(key, None)",False,other
+problematic_9,83,# Insecure global function,True,poor_practice
+problematic_9,84,"def admin_access(username, action):",False,other
+problematic_9,85,    # XXX: No proper authorization,True,incomplete_code
+problematic_9,86,"    if username == ""admin"":",False,other
+problematic_9,87,        exec(action)  # MAJOR SECURITY RISK: arbitrary code execution,True,security_risk
+problematic_9,88,        return True,False,other
+problematic_9,89,    return False,False,other

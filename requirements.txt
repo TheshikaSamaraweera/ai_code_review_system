@@ -1,0 +1,14 @@
+langchain
+langgraph
+google-generativeai
+faiss-cpu
+redis
+streamlit
+tree_sitter
+pylint
+bandit
+flake8
+semgrep
+tqdm
+uvicorn
+fastapi
