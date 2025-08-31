@@ -1,4 +1,3 @@
-# agents/control_agent.py
 import os
 import tempfile
 from typing import Dict, List, Any, Optional
@@ -19,7 +18,6 @@ from utils.context_analyzer import analyze_project_context
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class AnalysisConfig:
     """Configuration for analysis parameters."""
@@ -28,7 +26,6 @@ class AnalysisConfig:
     apply_optimizations: bool = True
     interactive_mode: bool = True
     save_intermediate_results: bool = True
-
 
 @dataclass
 class AnalysisResults:
@@ -41,10 +38,8 @@ class AnalysisResults:
     final_code: str
     analysis_summary: Dict[str, Any]
 
-
 class EnhancedControlAgent:
     """Enhanced control agent with better flow management and configuration."""
-
     def __init__(self, config: AnalysisConfig = None):
         self.config = config or AnalysisConfig()
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
@@ -142,6 +137,7 @@ class EnhancedControlAgent:
         print("  🤖 Running AI Quality Analysis...")
         quality_results = run_quality_agent(code, api_key, context)
         quality_score = quality_results.get("score", 0)
+        print(f"✅ Quality Agent completed - Score: {quality_score}/100")
 
         # Static analysis
         print("  🔧 Running Static Analysis...")
@@ -209,6 +205,7 @@ class EnhancedControlAgent:
         # Auto-proceed if quality is below threshold
         if quality_score < self.config.min_quality_threshold:
             print(f"\n⚡ Quality score ({quality_score}) below threshold ({self.config.min_quality_threshold})")
+            return True
 
         # Ask user in interactive mode
         if issues_count == 0:
@@ -320,7 +317,6 @@ class EnhancedControlAgent:
             analysis_summary=summary
         )
 
-
 # Backward compatibility function
 def run_control_agent(code: str, language: str, project_dir: str = ".") -> Optional[str]:
     """
@@ -337,14 +333,10 @@ def run_control_agent(code: str, language: str, project_dir: str = ".") -> Optio
     try:
         config = AnalysisConfig(interactive_mode=True)
         agent = EnhancedControlAgent(config)
-
         results = agent.analyze_code_comprehensive(code, language, project_dir)
-
         print(f"\n📊 Session Summary:")
         show_session_summary()
-
         return results.final_code
-
     except Exception as e:
         logger.error(f"Control agent failed: {e}")
         print(f"❌ Control agent failed: {e}")
