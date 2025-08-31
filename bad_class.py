@@ -1,45 +1,45 @@
 # bad_class.py
 
-import os, sys, math, json, re, time  # unused imports (issue)
+import os, sys, math, json, re, time
 
-class badclass:   # bad class name style (issue)
-    CONSTVALUE=10 # no spaces around = (issue)
-    def __init__(self,x,y,z = 5): # bad spacing, mutable default missing, bad naming (issues)
+class badclass:
+    CONSTVALUE=10
+    def __init__(self,x,y,z = 5):
         self.x=x
-        self.Y=y  # inconsistent naming convention (issue)
+        self.Y=y
         self.z=z
-        self.data=[] # shadowing builtin 'data' var, unclear name (issue)
-        self.password="12345"  # hardcoded password (security issue)
-        self.APIKEY="abcd1234"  # hardcoded secret (security issue)
+        self.data=[]
+        self.password="12345"
+        self.APIKEY="abcd1234"
         self.flag=True
 
-    def addNumbers(self,a,b):  # bad naming (camelCase in python)
+    def addNumbers(self,a,b):
         c=a+b
         d=a+0
         e=a*1
-        return c   # unused variables d,e (issue)
+        return c
 
     def multiply(self,a,b):
-        return a*b*1  # redundant *1 (issue)
+        return a*b*1
 
     def div(self,a,b):
-        return a/b  # no zero check (bug)
+        return a/b
 
     def loopBad(self):
-        for i in range(0, len(self.data)):  # inefficient iteration (issue)
+        for i in range(0, len(self.data)):
             print(i)
-            if i==9999999999:  # impossible condition (dead code issue)
+            if i==9999999999:
                 break
 
     def recursion(self,n):
         if n==0: return 0
-        else: return n+self.recursion(n-1) # no recursion limit check (stack overflow issue)
+        else: return n+self.recursion(n-1)
 
     def insecure_eval(self,code):
-        eval(code)  # security issue
+        eval(code)
 
     def insecure_exec(self,code):
-        exec(code)  # security issue
+        exec(code)
 
     def compare(self,a,b):
         if a==None:  # should use 'is None'
