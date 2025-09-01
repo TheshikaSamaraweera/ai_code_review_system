@@ -1,0 +1,13 @@
+# config.yaml
+analysis:
+  min_score_threshold: 90.0  # Lowered from 95 for flexibility
+  max_iterations: 5
+  max_high_severity_issues: 0
+  stagnation_threshold: 2
+  convergence_threshold: 2.0
+  issue_weights:  # New: Weight issues by type
+    security: 2.0
+    bug: 1.5
+    performance: 1.2
+    style: 0.8
+    general: 1.0
