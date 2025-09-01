@@ -1,6 +1,8 @@
+# main.py
 import os
 import tempfile
 import json
+import argparse  # New import
 from utils.file_loader import load_file
 from agents.quality_agent import run_quality_agent
 from agents.static_analysis_agent import run_static_analysis
@@ -9,8 +11,8 @@ from controls.recursive_controller import build_langgraph_loop
 from utils.context_analyzer import analyze_project_context
 from dotenv import load_dotenv
 
-
 def format_initial_analysis_report(quality_results, static_results, merged_issues, code_path):
+    # Unchanged, keeping original function
     score = quality_results.get("score", 0)
     ai_issues = quality_results.get("issues", [])
     static_issues = static_results
@@ -56,7 +58,6 @@ def format_initial_analysis_report(quality_results, static_results, merged_issue
     else:
         sources = {"AI": [], "Static": [], "Both": []}
         for issue in merged_issues:
-            # Ensure all required fields are present
             issue.setdefault("explanation", "No specific explanation provided.")
             issue.setdefault("severity", "medium")
             issue.setdefault("confidence", 0.8)
@@ -112,8 +113,8 @@ def format_initial_analysis_report(quality_results, static_results, merged_issue
     report += f"\n{'=' * 80}\n"
     return report
 
-
 def format_iteration_summary(final):
+    # Unchanged, keeping original function
     report = f"""
 {'=' * 80}
 🎯 ITERATIVE OPTIMIZATION COMPLETE
@@ -148,7 +149,6 @@ def format_iteration_summary(final):
 
     return report
 
-
 def main():
     load_dotenv()
     api_key = os.getenv("GEMINI_API_KEY")
@@ -156,7 +156,14 @@ def main():
         print("❌ GEMINI_API_KEY environment variable not set.")
         return
 
-    code_path = input("📄 Enter the path to your code file: ").strip()
+    # Add CLI argument parsing
+    parser = argparse.ArgumentParser(description="AI Code Reviewer")
+    parser.add_argument("code_path", help="Path to the code file")
+    parser.add_argument("--max-iterations", type=int, default=5, help="Maximum number of iterations")
+    parser.add_argument("--force-stop", action="store_true", help="Force stop after one iteration")
+    args = parser.parse_args()
+
+    code_path = args.code_path.strip()
     if not os.path.exists(code_path):
         print("❌ File not found.")
         return
@@ -196,11 +203,14 @@ def main():
         "issue_count": len(merged_issues),
         "issues_fixed": 0,
         "feedback": [],
-        "min_score_threshold": 95.0,
+        "min_score_threshold": 90.0,  # Match config.yaml default
         "max_high_severity_issues": 0,
-        "max_iterations": 5,
+        "max_iterations": args.max_iterations,  # Use CLI arg
         "context": context,
-        "optimization_applied": False
+        "optimization_applied": False,
+        "previous_scores": [],
+        "stagnation_count": 0,
+        "user_stop": args.force_stop  # New: User-defined stop
     }
 
     graph = build_langgraph_loop()
@@ -210,7 +220,6 @@ def main():
     print("\n📚 Session Summary:")
     from memory.session_memory import show_session_summary
     show_session_summary()
-
 
 if __name__ == "__main__":
     main()
